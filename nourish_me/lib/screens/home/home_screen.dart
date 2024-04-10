@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nourish_me/screens/home_page/home_page_screen.dart';
 import 'package:nourish_me/screens/widget/bottomnavhome.dart';
 import 'package:nourish_me/theme%20library/theme_library.dart';
 
@@ -18,12 +19,10 @@ class HomeScreen extends StatelessWidget {
       ),
 
       //body
-      body: Center(
-        child: Text(
-          'Home Screen',
-          style: TextStyle(color: Primary_green),
-        ),
+      body: const SafeArea(
+        child: homeScreenPage(),
       ),
+
       bottomNavigationBar: const BottomNav(),
     );
   }
