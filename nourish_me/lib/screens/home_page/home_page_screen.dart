@@ -50,10 +50,24 @@ class homeScreenPage extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 10.0),
-                    const Text(
-                      '53/Kcal',
-                      style: TextStyle(
-                          fontSize: 30.0, fontWeight: FontWeight.w800),
+                    const Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(
+                          '53/Kcal',
+                          style: TextStyle(
+                            fontSize: 30.0,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        Text(
+                          'Gain 3kg',
+                          style: TextStyle(
+                              fontSize: 14.0,
+                              fontWeight: FontWeight.w800,
+                              color: primary_),
+                        ),
+                      ],
                     ),
                   ],
                 ),
