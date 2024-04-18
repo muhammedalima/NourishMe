@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+
 import 'package:nourish_me/screens/home_page/widgets/home_widgets.dart';
-import 'package:nourish_me/theme%20library/theme_library.dart';
 
 class homeScreenPage extends StatelessWidget {
   const homeScreenPage({super.key});
@@ -32,6 +32,7 @@ class homeScreenPage extends StatelessWidget {
             padding: EdgeInsets.all(37.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   'Other Tracker',
@@ -42,31 +43,39 @@ class homeScreenPage extends StatelessWidget {
                 ),
                 Row(
                   children: [
-                    SquareBox(
-                      heading: 'Daily Water \n Tracker',
-                      boxcolor: Color(0xFFC0DB3F),
+                    Expanded(
+                      child: SquareBox(
+                        heading: 'Daily Water \n Tracker',
+                        boxcolor: Color(0xFFC0DB3F),
+                      ),
                     ),
-                    SquareBox(
-                      heading: 'Diet Plan \n For The Day',
-                      boxcolor: Color(0xFF5E3FDB),
-                    )
+                    Expanded(
+                      child: SquareBox(
+                        heading: 'Diet Plan \n For The Day',
+                        boxcolor: Color(0xFF5E3FDB),
+                      ),
+                    ),
                   ],
                 ),
                 Row(
                   children: [
-                    SquareBox(
-                      heading: 'Daily Water \n Tracker',
-                      boxcolor: Color(0xFFC0DB3F),
+                    Expanded(
+                      child: SquareBox(
+                        heading: 'Daily Water \n Tracker',
+                        boxcolor: Color(0xFFC0DB3F),
+                      ),
                     ),
-                    SquareBox(
-                      heading: 'Diet Plan \n For The Day',
-                      boxcolor: Color(0xFF5E3FDB),
-                    )
+                    Expanded(
+                      child: SquareBox(
+                        heading: 'Diet Plan \n For The Day',
+                        boxcolor: Color(0xFF5E3FDB),
+                      ),
+                    ),
                   ],
                 ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );

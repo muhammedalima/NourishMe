@@ -33,7 +33,9 @@ class AddCard extends StatelessWidget {
             ),
           ),
         ),
-
+        const SizedBox(
+          height: 5,
+        ),
         // Card with content
         Card(
           margin: const EdgeInsets.symmetric(horizontal: 37.0),
@@ -60,9 +62,10 @@ class AddCard extends StatelessWidget {
                         color: Colors.black,
                       ),
                     ),
-                    const SizedBox(width: 10.0),
+                    const SizedBox(width: 15.0),
                     Column(
                       mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           headingInsideCard,
@@ -118,54 +121,48 @@ class SquareBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 170,
-      width: 155,
-      decoration: const ShapeDecoration(
-        shape: RoundedRectangleBorder(),
-      ),
-      child: Card(
-        color: boxcolor,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Text(
-              heading,
-              style: TextStyle(
-                color: (boxcolor == Color(0xFFC0DB3F))
-                    ? Colors.black
-                    : Colors.white,
+    return Card(
+      color: boxcolor,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          const SizedBox(
+            height: 20,
+          ),
+          Text(
+            heading,
+            style: TextStyle(
+              color: (boxcolor == const Color(0xFFC0DB3F))
+                  ? Colors.black
+                  : Colors.white,
+            ),
+          ),
+          const SizedBox(height: 30),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              ElevatedButton(
+                onPressed: () {},
+                style: ElevatedButton.styleFrom(
+                  fixedSize: const Size(36, 36),
+                  backgroundColor: Colors.black,
+                  shape: const CircleBorder(),
+                  padding: const EdgeInsets.all(8.0),
+                ),
+                child: Transform.rotate(
+                  angle: 330 * math.pi / 180,
+                  child: const Icon(
+                    Icons.arrow_forward,
+                    color: Colors.white,
+                  ),
+                ),
               ),
-            ),
-            const SizedBox(height: 30),
-            Row(
-              children: [
-                SizedBox(
-                  width: 80,
-                ),
-                ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    fixedSize: const Size(36, 36),
-                    backgroundColor: Colors.black,
-                    shape: const CircleBorder(),
-                    padding: const EdgeInsets.all(8.0),
-                  ),
-                  child: Transform.rotate(
-                    angle: 330 * math.pi / 180,
-                    child: const Icon(
-                      Icons.arrow_forward,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(
-              height: 15,
-            ),
-          ],
-        ),
+            ],
+          ),
+          const SizedBox(
+            height: 15,
+          ),
+        ],
       ),
     );
   }
