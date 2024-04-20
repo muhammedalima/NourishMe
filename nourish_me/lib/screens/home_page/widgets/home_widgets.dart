@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'package:nourish_me/theme%20library/theme_library.dart';
 import 'dart:math' as math;
 
@@ -6,12 +7,14 @@ class AddCard extends StatelessWidget {
   final String headingTitle;
   final String headingInsideCard;
   final String subHeadingCard;
+  final Widget screens;
 
   const AddCard({
     super.key,
     required this.headingTitle,
     required this.headingInsideCard,
     required this.subHeadingCard,
+    required this.screens,
   });
 
   @override
@@ -89,7 +92,10 @@ class AddCard extends StatelessWidget {
 
                 // Elevated button
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => screens));
+                  },
                   style: ElevatedButton.styleFrom(
                     fixedSize: const Size(36, 36),
                     backgroundColor: Colors.black,
@@ -113,10 +119,12 @@ class AddCard extends StatelessWidget {
 class SquareBox extends StatelessWidget {
   final String heading;
   final Color boxcolor;
+  final Widget screens;
   const SquareBox({
     super.key,
     required this.heading,
     required this.boxcolor,
+    required this.screens,
   });
 
   @override
@@ -129,20 +137,31 @@ class SquareBox extends StatelessWidget {
           const SizedBox(
             height: 20,
           ),
-          Text(
-            heading,
-            style: TextStyle(
-              color: (boxcolor == const Color(0xFFC0DB3F))
-                  ? Colors.black
-                  : Colors.white,
-            ),
+          Row(
+            children: [
+              const SizedBox(
+                width: 20,
+              ),
+              Text(
+                heading,
+                style: TextStyle(
+                  color: (boxcolor == const Color(0xFFC0DB3F))
+                      ? Colors.black
+                      : Colors.white,
+                ),
+              ),
+              const Expanded(child: SizedBox(height: 30)),
+            ],
           ),
           const SizedBox(height: 30),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => screens));
+                },
                 style: ElevatedButton.styleFrom(
                   fixedSize: const Size(36, 36),
                   backgroundColor: Colors.black,

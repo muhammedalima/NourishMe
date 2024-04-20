@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:nourish_me/screens/secondarynavpages/calories_screen.dart';
 import 'package:nourish_me/screens/home_page/widgets/home_widgets.dart';
 
 class homeScreenPage extends StatelessWidget {
@@ -11,16 +11,19 @@ class homeScreenPage extends StatelessWidget {
       child: Column(
         children: [
           AddCard(
+            screens: CaloriesPage(),
             headingTitle: 'Goal',
             headingInsideCard: '53/Kcal',
             subHeadingCard: 'Eat Upto',
           ),
           AddCard(
+            screens: CaloriesPage(),
             headingTitle: 'Weight',
             headingInsideCard: '48.5kg',
             subHeadingCard: 'Gain 3kg',
           ),
           AddCard(
+            screens: CaloriesPage(),
             headingTitle: 'Exercise',
             headingInsideCard: 'Hard',
             subHeadingCard: 'Exercise Type',
@@ -45,12 +48,14 @@ class homeScreenPage extends StatelessWidget {
                   children: [
                     Expanded(
                       child: SquareBox(
+                        screens: CaloriesPage(),
                         heading: 'Daily Water \n Tracker',
                         boxcolor: Color(0xFFC0DB3F),
                       ),
                     ),
                     Expanded(
                       child: SquareBox(
+                        screens: CaloriesPage(),
                         heading: 'Diet Plan \n For The Day',
                         boxcolor: Color(0xFF5E3FDB),
                       ),
@@ -61,14 +66,16 @@ class homeScreenPage extends StatelessWidget {
                   children: [
                     Expanded(
                       child: SquareBox(
-                        heading: 'Daily Water \n Tracker',
-                        boxcolor: Color(0xFFC0DB3F),
+                        screens: CaloriesPage(),
+                        heading: 'Check Your\nCalorie',
+                        boxcolor: Color(0xFF5E3FDB),
                       ),
                     ),
                     Expanded(
                       child: SquareBox(
-                        heading: 'Diet Plan \n For The Day',
-                        boxcolor: Color(0xFF5E3FDB),
+                        screens: CaloriesPage(),
+                        heading: 'Educational\nResources',
+                        boxcolor: Color(0xFFC0DB3F),
                       ),
                     ),
                   ],

@@ -1,8 +1,12 @@
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import 'package:nourish_me/screens/splash_screen.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+
   runApp(const NourishMe());
 }
 
@@ -13,7 +17,7 @@ class NourishMe extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: 'Flutter Demo',
+        title: 'Nourish Me',
         theme: ThemeData(
           textTheme: GoogleFonts.interTextTheme(
             Theme.of(context).textTheme,
@@ -33,7 +37,7 @@ class NourishMe extends StatelessWidget {
           // This works for code too, not just values: Most code changes can be
           // tested with just a hot reload.
           colorScheme: ColorScheme.fromSeed(
-            seedColor: Color(0xFFC0DB3F),
+            seedColor: const Color(0xFFC0DB3F),
             background: Colors.black,
           ),
           useMaterial3: true,
