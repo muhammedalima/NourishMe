@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:nourish_me/screens/secondarynavpages/calories/calories_screen.dart';
-import 'package:nourish_me/theme%20library/theme_library.dart';
+import 'package:nourish_me/theme_library/theme_library.dart';
 
 class ImageCaloriesPage extends StatefulWidget {
   final File imagefile;
@@ -23,7 +23,6 @@ class _ImageCaloriesPageState extends State<ImageCaloriesPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     FinalCalories = Calories;
   }

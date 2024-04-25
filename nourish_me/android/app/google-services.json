@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "324165858656",
+    "project_id": "nourishme-9b536",
+    "storage_bucket": "nourishme-9b536.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:324165858656:android:94fef9f68b47e0628f5a05",
+        "android_client_info": {
+          "package_name": "com.example.nourish_me"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBeAXlpKvKElIrqBoNSMh8v8O0ofKmE-0E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

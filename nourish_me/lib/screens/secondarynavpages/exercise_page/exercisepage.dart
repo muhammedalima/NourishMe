@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:nourish_me/screens/home/home_screen.dart';
-import 'package:nourish_me/theme%20library/theme_library.dart';
+import 'package:nourish_me/theme_library/theme_library.dart';
 
 class ExercisePage extends StatefulWidget {
   const ExercisePage({super.key});

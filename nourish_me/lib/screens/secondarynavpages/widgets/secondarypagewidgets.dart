@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:nourish_me/screens/secondarynavpages/calories/image_calories_screen.dart';
-import 'package:nourish_me/theme%20library/theme_library.dart';
+import 'package:nourish_me/theme_library/theme_library.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:nourish_me/main.dart';
 

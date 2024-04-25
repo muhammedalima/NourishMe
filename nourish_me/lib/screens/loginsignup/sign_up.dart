@@ -1,24 +1,15 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:nourish_me/screens/loginsignup/sign_up.dart';
+import 'package:nourish_me/screens/loginsignup/login_page.dart';
 import 'package:nourish_me/theme_library/theme_library.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
-  TextEditingController email = TextEditingController();
-  TextEditingController password = TextEditingController();
-
-  signin() async {
-    await FirebaseAuth.instance
-        .signInWithEmailAndPassword(email: email.text, password: password.text);
-  }
-
+class _SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     final bottomInsets = MediaQuery.of(context).viewInsets.bottom;
@@ -38,19 +29,14 @@ class _LoginScreenState extends State<LoginScreen> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pushReplacement(
-                            MaterialPageRoute(
-                              builder: (_) => const SignUpScreen(),
-                            ),
-                          );
-                        },
+                        onPressed: () {},
                         child: Text(
                           'Sign Up',
                           style: TextStyle(
-                              fontSize: 30,
-                              fontWeight: FontWeight.bold,
-                              color: Primary_green),
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                       Text(
@@ -61,20 +47,26 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.of(context).pushReplacement(
+                            MaterialPageRoute(
+                              builder: (_) => const LoginScreen(),
+                            ),
+                          );
+                        },
                         child: Text(
                           'Login',
                           style: TextStyle(
                             fontSize: 30,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: Primary_green,
                           ),
                         ),
                       ),
                     ],
                   ),
                   Text(
-                    'Let Continue The Healthy Journey',
+                    'Lets Starts the Health Journey',
                     style: TextStyle(
                       color: Colors.white,
                     ),
@@ -110,7 +102,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         children: [
                           Flexible(
                             child: TextFormField(
-                              controller: email,
                               decoration: InputDecoration(
                                 fillColor: Primary_green,
                                 icon: Icon(Icons.mail),
@@ -148,12 +139,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         children: [
                           Flexible(
                             child: TextFormField(
-                              controller: password,
                               decoration: InputDecoration(
                                 fillColor: Primary_green,
                                 icon: Icon(Icons.lock),
                                 border: InputBorder.none,
-                                hintText: 'Password',
+                                hintText: 'Create Password',
                                 hintStyle: TextStyle(color: Colors.white54),
                               ),
                               style: const TextStyle(
@@ -180,9 +170,13 @@ class _LoginScreenState extends State<LoginScreen> {
                             borderRadius: BorderRadius.circular(10.0),
                           ),
                         ),
-                        onPressed: (() => signin()),
+                        onPressed: () {
+                          print(
+                            'Completed',
+                          );
+                        },
                         child: Text(
-                          'login',
+                          'SignUp',
                           style: TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.w900,

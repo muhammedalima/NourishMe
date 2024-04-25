@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nourish_me/screens/home_page/home_page_screen.dart';
 import 'package:nourish_me/screens/profile/profile_screen.dart';
 import 'package:nourish_me/screens/widget/bottomnavhome.dart';
-import 'package:nourish_me/theme%20library/theme_library.dart';
+import 'package:nourish_me/theme_library/theme_library.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});

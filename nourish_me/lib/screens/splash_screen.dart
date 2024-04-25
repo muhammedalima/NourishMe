@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:nourish_me/screens/home/home_screen.dart';
-import 'package:nourish_me/screens/loginsignup/login_page.dart';
-import 'package:nourish_me/theme%20library/theme_library.dart';
+import 'package:nourish_me/screens/loginsignup/wrapper.dart';
+import 'package:nourish_me/theme_library/theme_library.dart';
 
 class splashScreen extends StatefulWidget {
   const splashScreen({super.key});
@@ -17,10 +17,13 @@ class _splash_screenState extends State<splashScreen>
   void initState() {
     super.initState();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
-    Future.delayed(const Duration(seconds: 2), () {
-      Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const LoginScreen()));
-    });
+    Future.delayed(
+      const Duration(seconds: 4),
+      () {
+        Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const Wrapper()));
+      },
+    );
   }
 
   @override
@@ -38,10 +41,11 @@ class _splash_screenState extends State<splashScreen>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.image,
-            color: Primary_green,
-            size: 80,
+          SizedBox(
+            height: 200,
+            child: Image.asset(
+              "assets/images/NourishNavyNobgeyeblink.png",
+            ),
           ),
           const SizedBox(
             height: 20,
