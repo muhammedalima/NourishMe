@@ -1,18 +1,20 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:nourish_me/screens/secondarynavpages/widgets/secondarypagewidgets.dart';
-import 'package:nourish_me/theme%20library/theme_library.dart';
 import 'package:intl/intl.dart';
+import 'package:nourish_me/screens/home/home_screen.dart';
+import 'package:nourish_me/theme%20library/theme_library.dart';
 
-class CaloriesPage extends StatefulWidget {
-  const CaloriesPage({super.key});
+class WaterTracker extends StatefulWidget {
+  const WaterTracker({super.key});
 
   @override
-  State<CaloriesPage> createState() => _CaloriesPageState();
+  State<WaterTracker> createState() => _WaterTrackerState();
 }
 
-class _CaloriesPageState extends State<CaloriesPage> {
-  DateTime? _selectedDate = DateTime.now();
+class _WaterTrackerState extends State<WaterTracker> {
+  DateTime _selectedDate = DateTime.now();
+  DateTime Timeofwaterdrunk = DateTime.now();
   String PrintedDate = 'Today';
   String Parsedate(DateTime date) {
     return '${DateFormat.d().format(date)} ${DateFormat.MMM().format(date)}';
@@ -22,7 +24,7 @@ class _CaloriesPageState extends State<CaloriesPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Calories'),
+        title: const Text('Water Tracker'),
         backgroundColor: Primary_green,
       ),
       body: SafeArea(
@@ -60,8 +62,8 @@ class _CaloriesPageState extends State<CaloriesPage> {
                             return;
                           } else {
                             _selectedDate = _selectedDatetemp;
-                            print(_selectedDate);
-                            PrintedDate = Parsedate(_selectedDate!);
+
+                            PrintedDate = Parsedate(_selectedDate);
                             setState(() {});
                           }
                         },
@@ -73,7 +75,7 @@ class _CaloriesPageState extends State<CaloriesPage> {
                   height: 40,
                 ),
                 Text(
-                  'Update Calories of ${PrintedDate}',
+                  'Update Calories of ${PrintedDate} ',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 16,
@@ -97,9 +99,10 @@ class _CaloriesPageState extends State<CaloriesPage> {
                       children: [
                         Flexible(
                           child: TextFormField(
+                            keyboardType: TextInputType.number,
                             decoration: const InputDecoration(
                               border: InputBorder.none,
-                              hintText: 'Enter Food You Ate',
+                              hintText: 'Number of Glasses',
                               hintStyle: TextStyle(color: Colors.white30),
                             ),
                             style: const TextStyle(
@@ -114,14 +117,10 @@ class _CaloriesPageState extends State<CaloriesPage> {
                             shape: CircleBorder(),
                           ),
                           child: IconButton(
-                            icon: const Icon(Icons.photo_camera),
+                            icon: const Icon(Icons.schedule),
                             color: Colors.white,
                             onPressed: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => CameraAccessWidget(),
-                                  ));
+                              _showDialog(context);
                             },
                           ),
                         ),
@@ -166,15 +165,15 @@ class _CaloriesPageState extends State<CaloriesPage> {
                           ),
                           child: Card(
                             color: Primary_green,
-                            child: const ListTile(
+                            child: ListTile(
                               title: Text(
-                                'Bread & Omlette',
+                                '${Timeofwaterdrunk.hour}:${Timeofwaterdrunk.minute}',
                                 style: TextStyle(
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
                               trailing: Text(
-                                '10kcal',
+                                '1 Glass',
                                 style: TextStyle(
                                   color: Color(0xFF6F6F6F),
                                   fontWeight: FontWeight.w900,
@@ -205,6 +204,11 @@ class _CaloriesPageState extends State<CaloriesPage> {
                         ),
                       ),
                       onPressed: () {
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(builder: (context) => HomeScreen()),
+                          (Route<dynamic> route) => false,
+                        );
                         print(
                           'Completed',
                         );
@@ -224,6 +228,27 @@ class _CaloriesPageState extends State<CaloriesPage> {
           ),
         ),
       ),
+    );
+  }
+
+  void _showDialog(BuildContext context) {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          height: 216,
+          color: Primary_green,
+          child: CupertinoDatePicker(
+            backgroundColor: Primary_green,
+            mode: CupertinoDatePickerMode.time,
+            onDateTimeChanged: (DateTime time) {
+              setState(() {
+                Timeofwaterdrunk = time;
+              });
+            },
+          ),
+        );
+      },
     );
   }
 }

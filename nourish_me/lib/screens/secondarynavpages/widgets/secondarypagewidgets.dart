@@ -1,6 +1,11 @@
+import 'dart:developer';
+import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:nourish_me/screens/secondarynavpages/calories/image_calories_screen.dart';
 import 'package:nourish_me/theme%20library/theme_library.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:nourish_me/main.dart';
 
 class CameraAccessWidget extends StatefulWidget {
   const CameraAccessWidget({Key? key}) : super(key: key);
@@ -10,33 +15,34 @@ class CameraAccessWidget extends StatefulWidget {
 }
 
 class _CameraAccessWidgetState extends State<CameraAccessWidget> {
-  late List<CameraDescription> cameras;
   late CameraController cameraController;
-
+  XFile? imageFile;
   int direction = 0;
 
   @override
   void initState() {
-    startCamera(direction);
     super.initState();
-  }
-
-  void startCamera(int direction) async {
-    cameras = await availableCameras();
-
-    cameraController = await CameraController(
-      cameras[direction],
+    cameraController = CameraController(
+      cameras[0],
       ResolutionPreset.high,
       enableAudio: false,
     );
-
-    await cameraController.initialize().then((value) {
+    cameraController.initialize().then((_) {
       if (!mounted) {
         return;
       }
-      setState(() {}); //To refresh widget
-    }).catchError((e) {
-      print(e);
+      setState(() {});
+    }).catchError((Object e) {
+      if (e is CameraException) {
+        switch (e.code) {
+          case 'CameraAccessDenied':
+            // Handle access errors here.
+            break;
+          default:
+            // Handle other errors here.
+            break;
+        }
+      }
     });
   }
 
@@ -59,18 +65,36 @@ class _CameraAccessWidgetState extends State<CameraAccessWidget> {
           children: [
             Container(
               color: Primary_green,
-              padding: EdgeInsetsDirectional.fromSTEB(20, 20, 20, 110),
+              padding: EdgeInsetsDirectional.fromSTEB(20, 20, 20, 120),
               child: CameraPreview(cameraController),
             ),
             GestureDetector(
-              onTap: () {
-                cameraController.takePicture().then((XFile? file) {
-                  if (mounted) {
-                    if (file != null) {
-                      print("Picture saved to ${file.path}");
-                    }
+              onTap: () async {
+                try {
+                  cameraController.setFlashMode(FlashMode.off);
+                  if (cameraController.value.isInitialized) {
+                    final image = await cameraController.takePicture();
+                    log("image $image");
+                    final File clickedImage = File(image.path);
+                    final tempDir = await getTemporaryDirectory();
+                    String filePath = tempDir.path;
+                    String fileName = DateTime.now().toString();
+                    final File localImage =
+                        await clickedImage.copy("$filePath/$fileName");
+                    log("file : ${localImage.path}");
+                    setState(() {
+                      print("Clicked");
+                    });
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                          builder: (context) => ImageCaloriesPage(
+                                imagefile: localImage,
+                              )),
+                    );
                   }
-                });
+                } catch (e) {
+                  print(e); //show error
+                }
               },
               child: Container(
                 child: Column(

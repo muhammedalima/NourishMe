@@ -1,13 +1,20 @@
 import 'package:camera/camera.dart';
+import 'package:flutter_gemini/flutter_gemini.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import 'package:nourish_me/screens/splash_screen.dart';
 
-void main() {
-  WidgetsFlutterBinding.ensureInitialized();
+late List<CameraDescription> cameras;
 
-  runApp(const NourishMe());
+void main() async {
+  Gemini.init(
+    apiKey: 'AIzaSyAsKT6BMedNILln1Jb7NerLcGeqESvfW1k',
+  );
+  WidgetsFlutterBinding.ensureInitialized();
+  cameras = await availableCameras();
+  runApp(
+    const NourishMe(),
+  );
 }
 
 class NourishMe extends StatelessWidget {
@@ -22,6 +29,7 @@ class NourishMe extends StatelessWidget {
           textTheme: GoogleFonts.interTextTheme(
             Theme.of(context).textTheme,
           ),
+
           // This is the theme of your application.
           // TRY THIS: Try running your application with "flutter run". You'll see
           // the application has a purple toolbar. Then, without quitting the app,

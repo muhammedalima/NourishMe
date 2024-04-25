@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:nourish_me/screens/secondarynavpages/calories_screen.dart';
+import 'package:nourish_me/screens/other_trackers/Diet_plan/Diet_planer.dart';
+import 'package:nourish_me/screens/other_trackers/water_tracker/water_tracker.dart';
+import 'package:nourish_me/screens/secondarynavpages/Weight_Page/weight_page.dart';
+import 'package:nourish_me/screens/secondarynavpages/calories/calories_screen.dart';
 import 'package:nourish_me/screens/home_page/widgets/home_widgets.dart';
+import 'package:nourish_me/screens/secondarynavpages/exercise_page/exercisepage.dart';
 
 class homeScreenPage extends StatelessWidget {
   const homeScreenPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const SingleChildScrollView(
+    return SingleChildScrollView(
       child: Column(
         children: [
           AddCard(
@@ -17,13 +21,13 @@ class homeScreenPage extends StatelessWidget {
             subHeadingCard: 'Eat Upto',
           ),
           AddCard(
-            screens: CaloriesPage(),
+            screens: WeightPage(),
             headingTitle: 'Weight',
             headingInsideCard: '48.5kg',
             subHeadingCard: 'Gain 3kg',
           ),
           AddCard(
-            screens: CaloriesPage(),
+            screens: ExercisePage(),
             headingTitle: 'Exercise',
             headingInsideCard: 'Hard',
             subHeadingCard: 'Exercise Type',
@@ -48,14 +52,14 @@ class homeScreenPage extends StatelessWidget {
                   children: [
                     Expanded(
                       child: SquareBox(
-                        screens: CaloriesPage(),
+                        screens: WaterTracker(),
                         heading: 'Daily Water \n Tracker',
                         boxcolor: Color(0xFFC0DB3F),
                       ),
                     ),
                     Expanded(
                       child: SquareBox(
-                        screens: CaloriesPage(),
+                        screens: DietPlaner(),
                         heading: 'Diet Plan \n For The Day',
                         boxcolor: Color(0xFF5E3FDB),
                       ),

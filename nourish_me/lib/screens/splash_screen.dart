@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:nourish_me/screens/home/home_screen.dart';
+import 'package:nourish_me/screens/loginsignup/login_page.dart';
 import 'package:nourish_me/theme%20library/theme_library.dart';
 
 class splashScreen extends StatefulWidget {
@@ -18,7 +19,7 @@ class _splash_screenState extends State<splashScreen>
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
     Future.delayed(const Duration(seconds: 2), () {
       Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const HomeScreen()));
+          MaterialPageRoute(builder: (_) => const LoginScreen()));
     });
   }
 
