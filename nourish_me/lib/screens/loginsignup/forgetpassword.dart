@@ -1,25 +1,24 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:nourish_me/screens/loginsignup/forgetpassword.dart';
-import 'package:nourish_me/screens/loginsignup/sign_up.dart';
 import 'package:nourish_me/theme_library/theme_library.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+import 'wrapper.dart';
+
+class ForgetPassword extends StatefulWidget {
+  const ForgetPassword({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<ForgetPassword> createState() => _ForgetPasswordState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _ForgetPasswordState extends State<ForgetPassword> {
   TextEditingController email = TextEditingController();
-  TextEditingController password = TextEditingController();
-  bool _textvisible = false;
-  signin() async {
+
+  reset() async {
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: email.text, password: password.text);
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email.text);
+      Get.offAll(Wrapper());
     } on FirebaseAuthException catch (e) {
       Get.snackbar("Error", e.code, colorText: Primary_green);
     } catch (e) {
@@ -45,42 +44,18 @@ class _LoginScreenState extends State<LoginScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      TextButton(
-                        onPressed: (() => Get.to(
-                              () => SignUpScreen(),
-                            )),
-                        child: Text(
-                          'Sign Up',
-                          style: TextStyle(
-                              fontSize: 30,
-                              fontWeight: FontWeight.bold,
-                              color: Primary_green),
-                        ),
-                      ),
                       Text(
-                        '/',
+                        'Forget Password',
                         style: TextStyle(
-                          fontSize: 40,
+                          fontSize: 30,
+                          fontWeight: FontWeight.bold,
                           color: Colors.white,
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: (() => Get.to(
-                              ForgetPassword(),
-                            )),
-                        child: Text(
-                          'Login',
-                          style: TextStyle(
-                            fontSize: 30,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
                         ),
                       ),
                     ],
                   ),
                   Text(
-                    'Let Continue The Healthy Journey',
+                    'Remember Next Time',
                     style: TextStyle(
                       color: Colors.white,
                     ),
@@ -136,64 +111,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   SizedBox(
                     height: 10,
                   ),
-                  Container(
-                    margin: const EdgeInsets.all(
-                      6,
-                    ),
-                    height: 60,
-                    decoration: ShapeDecoration(
-                      shape: RoundedRectangleBorder(
-                        side: const BorderSide(width: 1, color: Colors.white),
-                        borderRadius: BorderRadius.circular(9),
-                      ),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Flexible(
-                            child: TextFormField(
-                              obscureText: !_textvisible,
-                              controller: password,
-                              decoration: InputDecoration(
-                                fillColor: Primary_green,
-                                icon: Icon(Icons.lock),
-                                border: InputBorder.none,
-                                hintText: 'Password',
-                                hintStyle: TextStyle(color: Colors.white54),
-                                suffixIcon: IconButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      _textvisible = !_textvisible;
-                                    });
-                                  },
-                                  icon: Icon(
-                                    _textvisible
-                                        ? Icons.visibility
-                                        : Icons.visibility_off,
-                                  ),
-                                ),
-                              ),
-                              style: const TextStyle(
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () => Get.to(
-                      () => ForgetPassword(),
-                    ),
-                    child: Text(
-                      'Forget Password ?',
-                      style: TextStyle(
-                        color: Primary_green,
-                      ),
-                    ),
+                  SizedBox(
+                    height: 10,
                   ),
                   Padding(
                     padding: const EdgeInsets.all(6.0),
@@ -207,9 +126,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             borderRadius: BorderRadius.circular(10.0),
                           ),
                         ),
-                        onPressed: (() => signin()),
+                        onPressed: (() => reset()),
                         child: Text(
-                          'login',
+                          'Login',
                           style: TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.w900,

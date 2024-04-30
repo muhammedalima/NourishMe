@@ -1,5 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:nourish_me/screens/loginsignup/login_page.dart';
+import 'package:nourish_me/screens/loginsignup/wrapper.dart';
 import 'package:nourish_me/theme_library/theme_library.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -10,6 +13,23 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
+  TextEditingController email = TextEditingController();
+  TextEditingController password = TextEditingController();
+
+  bool _textvisible = false;
+
+  signup() async {
+    try {
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: email.text, password: password.text);
+      Get.offAll(Wrapper());
+    } on FirebaseAuthException catch (e) {
+      Get.snackbar("Error", e.code, colorText: Primary_green);
+    } catch (e) {
+      Get.snackbar("Error", e.toString());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final bottomInsets = MediaQuery.of(context).viewInsets.bottom;
@@ -47,13 +67,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ),
                       ),
                       TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pushReplacement(
-                            MaterialPageRoute(
-                              builder: (_) => const LoginScreen(),
-                            ),
-                          );
-                        },
+                        onPressed: (() => Get.to(
+                              LoginScreen(),
+                            )),
                         child: Text(
                           'Login',
                           style: TextStyle(
@@ -102,6 +118,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         children: [
                           Flexible(
                             child: TextFormField(
+                              controller: email,
                               decoration: InputDecoration(
                                 fillColor: Primary_green,
                                 icon: Icon(Icons.mail),
@@ -139,12 +156,26 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         children: [
                           Flexible(
                             child: TextFormField(
+                              obscureText: !_textvisible,
+                              controller: password,
                               decoration: InputDecoration(
                                 fillColor: Primary_green,
                                 icon: Icon(Icons.lock),
                                 border: InputBorder.none,
                                 hintText: 'Create Password',
                                 hintStyle: TextStyle(color: Colors.white54),
+                                suffixIcon: IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      _textvisible = !_textvisible;
+                                    });
+                                  },
+                                  icon: Icon(
+                                    _textvisible
+                                        ? Icons.visibility
+                                        : Icons.visibility_off,
+                                  ),
+                                ),
                               ),
                               style: const TextStyle(
                                 color: Colors.white,
@@ -170,11 +201,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             borderRadius: BorderRadius.circular(10.0),
                           ),
                         ),
-                        onPressed: () {
-                          print(
-                            'Completed',
-                          );
-                        },
+                        onPressed: (() => signup()),
                         child: Text(
                           'SignUp',
                           style: TextStyle(
