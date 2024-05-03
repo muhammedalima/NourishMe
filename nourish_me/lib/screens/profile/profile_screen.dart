@@ -2,7 +2,8 @@ import 'package:dropdown_textfield/dropdown_textfield.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:nourish_me/database/database.dart';
+import 'package:nourish_me/database/databaseuser.dart';
+import 'package:nourish_me/screens/home_page/widgets/home_widgets.dart';
 import 'package:nourish_me/theme_library/theme_library.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -14,6 +15,7 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   late bool edit;
+  final tweightcontroller = TextEditingController();
   final namecontroller = TextEditingController();
   final heightcontroller = TextEditingController();
   final weightcontroller = TextEditingController();
@@ -37,6 +39,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   late String height;
   late String bmi;
   late String gender;
+  late String tweight;
 
   getData() {
     name = getName();
@@ -44,13 +47,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     height = getHeight();
     gender = getGender();
     bmi = getbmi();
+    tweight = getTWeight();
   }
 
   singout() async {
     await FirebaseAuth.instance.signOut();
   }
 
-  bool isLoading = true;
+  bool isLoading = false;
   late String name;
   @override
   void initState() {
@@ -81,7 +85,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: isLoading
-          ? CircularProgressIndicator()
+          ? LoadingScreen()
           : SafeArea(
               child: Padding(
                 padding: EdgeInsets.symmetric(
@@ -347,6 +351,50 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         ],
                       ),
+                      edit
+                          ? Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Target Weight',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                Container(
+                                  margin: const EdgeInsets.all(
+                                    6,
+                                  ),
+                                  height: 50,
+                                  width: double.infinity,
+                                  decoration: ShapeDecoration(
+                                    shape: RoundedRectangleBorder(
+                                      side: const BorderSide(
+                                          width: 1, color: Colors.white),
+                                      borderRadius: BorderRadius.circular(9),
+                                    ),
+                                  ),
+                                  child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: TextFormField(
+                                        keyboardType: TextInputType.number,
+                                        controller: tweightcontroller,
+                                        decoration: InputDecoration(
+                                          border: InputBorder.none,
+                                          hintText: tweight,
+                                          hintStyle: TextStyle(
+                                            color: Colors.white70,
+                                          ),
+                                        ),
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                        ),
+                                      )),
+                                ),
+                              ],
+                            )
+                          : SizedBox(),
                       SizedBox(
                         height: 20,
                       ),
@@ -444,7 +492,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   onPressed: () async {
                                     try {
                                       if (edit) {
-                                        isLoading = true;
                                         if (namecontroller.text.isEmpty ||
                                             weightcontroller.text.isEmpty ||
                                             heightcontroller.text.isEmpty ||
@@ -454,21 +501,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                               "Please fill in all fields.",
                                               colorText: Colors.black);
                                           return;
-                                        }
-                                        await UserDB()
-                                            .addUserDetail(
-                                                namecontroller.text,
-                                                weightcontroller.text,
-                                                heightcontroller.text,
-                                                gendercontroller
-                                                    .dropDownValue!.value)
-                                            .whenComplete(() {
+                                        } else {
                                           setState(() {
-                                            getData();
-                                            edit = false;
-                                            isLoading = false;
+                                            isLoading = true;
                                           });
-                                        });
+
+                                          await UserDB()
+                                              .addUserDetail(
+                                                  namecontroller.text,
+                                                  weightcontroller.text,
+                                                  tweightcontroller.text,
+                                                  heightcontroller.text,
+                                                  gendercontroller
+                                                      .dropDownValue!.value)
+                                              .whenComplete(() {
+                                            setState(() {
+                                              getData();
+                                              edit = false;
+                                              isLoading = false;
+                                            });
+                                          });
+                                        }
                                       } else
                                         setState(() {
                                           edit = true;
@@ -504,6 +557,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     edit
                                         ? setState(() {
                                             edit = false;
+                                            isLoading = false;
                                           })
                                         : singout();
                                   },

@@ -1,7 +1,6 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:nourish_me/database/database.dart';
+import 'package:nourish_me/database/databaseuser.dart';
 import 'package:nourish_me/screens/loginsignup/wrapper.dart';
 import 'package:nourish_me/theme_library/theme_library.dart';
 
@@ -16,8 +15,8 @@ class _splash_screenState extends State<splashScreen>
     with SingleTickerProviderStateMixin {
   @override
   void initState() {
-    UserDB().RefreshData();
     super.initState();
+    UserDB().RefreshData();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
     Future.delayed(
       const Duration(seconds: 4),

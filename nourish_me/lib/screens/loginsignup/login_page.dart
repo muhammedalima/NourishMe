@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:nourish_me/database/databaseuser.dart';
 import 'package:nourish_me/screens/loginsignup/forgetpassword.dart';
 import 'package:nourish_me/screens/loginsignup/sign_up.dart';
 import 'package:nourish_me/theme_library/theme_library.dart';
@@ -20,6 +21,7 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: email.text, password: password.text);
+      await UserDB.instances.RefreshData();
     } on FirebaseAuthException catch (e) {
       Get.snackbar("Error", e.code, colorText: Primary_green);
     } catch (e) {

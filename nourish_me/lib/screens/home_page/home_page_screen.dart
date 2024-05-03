@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nourish_me/database/databaseuser.dart';
 import 'package:nourish_me/screens/other_trackers/Diet_plan/Diet_planer.dart';
 import 'package:nourish_me/screens/other_trackers/water_tracker/water_tracker.dart';
 import 'package:nourish_me/screens/secondarynavpages/Weight_Page/weight_page.dart';
@@ -15,18 +16,23 @@ class homeScreenPage extends StatelessWidget {
       child: Column(
         children: [
           AddCard(
+            progressindex: 0.1,
             screens: CaloriesPage(),
             headingTitle: 'Goal',
             headingInsideCard: '53/Kcal',
             subHeadingCard: 'Eat Upto',
           ),
           AddCard(
+            progressindex:
+                (int.parse(getTWeight()) / int.parse(getWeight())) / 10,
             screens: WeightPage(),
             headingTitle: 'Weight',
-            headingInsideCard: '48.5kg',
-            subHeadingCard: 'Gain 3kg',
+            headingInsideCard: '${getWeight()}kg',
+            subHeadingCard:
+                'Gain ${(int.parse(getTWeight()) - int.parse(getWeight()))}kg',
           ),
           AddCard(
+            progressindex: 0.2,
             screens: ExercisePage(),
             headingTitle: 'Exercise',
             headingInsideCard: 'Hard',
@@ -66,24 +72,24 @@ class homeScreenPage extends StatelessWidget {
                     ),
                   ],
                 ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: SquareBox(
-                        screens: CaloriesPage(),
-                        heading: 'Check Your\nCalorie',
-                        boxcolor: Color(0xFF5E3FDB),
-                      ),
-                    ),
-                    Expanded(
-                      child: SquareBox(
-                        screens: CaloriesPage(),
-                        heading: 'Educational\nResources',
-                        boxcolor: Color(0xFFC0DB3F),
-                      ),
-                    ),
-                  ],
-                ),
+                //Row(
+                //children: [
+                //Expanded(
+                //child: SquareBox(
+                //screens: CaloriesPage(),
+                //heading: 'Check Your\nCalorie',
+// boxcolor: Color(0xFF5E3FDB),
+//                      ),
+//                    ),
+                //                   Expanded(
+                //                    child: SquareBox(
+                //                     screens: CaloriesPage(),
+                //                    heading: 'Educational\nResources',
+                //                   boxcolor: Color(0xFFC0DB3F),
+                //               ),
+                //           ),
+                //       ],
+                //   ),
               ],
             ),
           ),

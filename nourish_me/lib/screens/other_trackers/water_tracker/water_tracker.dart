@@ -1,8 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:nourish_me/screens/home/home_screen.dart';
+import 'package:nourish_me/screens/home_page/widgets/home_widgets.dart';
+import 'package:nourish_me/screens/other_trackers/water_tracker/databasewater.dart';
 import 'package:nourish_me/theme_library/theme_library.dart';
 
 class WaterTracker extends StatefulWidget {
@@ -14,10 +17,33 @@ class WaterTracker extends StatefulWidget {
 
 class _WaterTrackerState extends State<WaterTracker> {
   DateTime _selectedDate = DateTime.now();
+  final NumberController = TextEditingController();
   DateTime Timeofwaterdrunk = DateTime.now();
   String PrintedDate = 'Today';
   String Parsedate(DateTime date) {
     return '${DateFormat.d().format(date)} ${DateFormat.MMM().format(date)}';
+  }
+
+  String ParseTime(DateTime date) {
+    return '${DateFormat.jm().format(date)}';
+  }
+
+  String ParsedateDB(DateTime date) {
+    return '${DateFormat.yMMMd().format(date)}';
+  }
+
+  late List<WaterListItem> WaterListed;
+  bool isLoading = true;
+  @override
+  void initState() {
+    isLoading = true;
+    WaterDB().getList(ParsedateDB(_selectedDate)).then((value) {
+      setState(() {
+        WaterListed = value;
+        isLoading = false;
+      });
+    });
+    super.initState();
   }
 
   @override
@@ -49,25 +75,47 @@ class _WaterTrackerState extends State<WaterTracker> {
                         shape: CircleBorder(),
                       ),
                       child: IconButton(
-                        icon: Icon(Icons.calendar_month),
-                        onPressed: () async {
-                          final _selectedDatetemp = await showDatePicker(
-                            context: context,
-                            initialDate: DateTime.now(),
-                            firstDate:
-                                DateTime.now().subtract(Duration(days: 30)),
-                            lastDate: DateTime.now(),
-                          );
-                          if (_selectedDatetemp == null) {
-                            return;
-                          } else {
-                            _selectedDate = _selectedDatetemp;
+                          icon: Icon(Icons.calendar_month),
+                          onPressed: () async {
+                            DateTime? selectedDatetemp = DateTime.now();
+                            selectedDatetemp = await showDatePicker(
+                              context: context,
+                              initialDate: DateTime.now(),
+                              firstDate:
+                                  DateTime.now().subtract(Duration(days: 365)),
+                              lastDate: DateTime.now(),
+                              builder: (BuildContext context, Widget) {
+                                return Theme(
+                                  data: ThemeData.light().copyWith(
+                                    primaryColor: Primary_green,
+                                    colorScheme: ColorScheme.light(
+                                        primary: Primary_green),
+                                    buttonTheme: ButtonThemeData(
+                                        textTheme: ButtonTextTheme.primary),
+                                  ),
+                                  child: Widget!,
+                                );
+                              },
+                            );
 
-                            PrintedDate = Parsedate(_selectedDate);
-                            setState(() {});
-                          }
-                        },
-                      ),
+                            setState(
+                              () {
+                                if (selectedDatetemp != DateTime.now()) {
+                                  _selectedDate = selectedDatetemp!;
+                                  PrintedDate = Parsedate(_selectedDate);
+                                  isLoading = true;
+                                  WaterDB()
+                                      .getList(ParsedateDB(_selectedDate))
+                                      .then((value) {
+                                    setState(() {
+                                      WaterListed = value;
+                                      isLoading = false;
+                                    });
+                                  });
+                                }
+                              },
+                            );
+                          }),
                     ),
                   ],
                 ),
@@ -99,6 +147,7 @@ class _WaterTrackerState extends State<WaterTracker> {
                       children: [
                         Flexible(
                           child: TextFormField(
+                            controller: NumberController,
                             keyboardType: TextInputType.number,
                             decoration: const InputDecoration(
                               border: InputBorder.none,
@@ -136,7 +185,42 @@ class _WaterTrackerState extends State<WaterTracker> {
                           child: IconButton(
                             icon: const Icon(Icons.add),
                             color: Colors.white,
-                            onPressed: () {},
+                            onPressed: () async {
+                              try {
+                                if (NumberController.text.isEmpty) {
+                                  Get.snackbar(
+                                      "Error", "Please fill in all fields.",
+                                      colorText: Colors.black);
+                                  return;
+                                } else {
+                                  setState(() {
+                                    isLoading = true;
+                                    WaterDB().addWater(
+                                        ParseTime(Timeofwaterdrunk),
+                                        NumberController.text.toString(),
+                                        ParsedateDB(_selectedDate));
+                                    WidgetsBinding
+                                        .instance.focusManager.primaryFocus
+                                        ?.unfocus();
+                                    WaterDB()
+                                        .getList(ParsedateDB(_selectedDate))
+                                        .then((value) {
+                                      setState(() {
+                                        WaterListed = value;
+                                        isLoading = false;
+                                        NumberController.clear();
+
+                                        isLoading = false;
+                                      });
+                                    });
+                                  });
+                                }
+                              } catch (e) {
+                                Get.snackbar("Error", e.toString(),
+                                    colorText: Primary_green);
+                              }
+                              ;
+                            },
                           ),
                         ),
                       ],
@@ -146,51 +230,69 @@ class _WaterTrackerState extends State<WaterTracker> {
                 const SizedBox(
                   height: 10,
                 ),
-                Container(
-                  height: 500,
-                  child: ListView.separated(
-                      itemBuilder: (BuildContext, int) {
-                        return Slidable(
-                          key: const Key('1'),
-                          startActionPane: ActionPane(
-                            motion: const StretchMotion(),
-                            children: [
-                              SlidableAction(
-                                onPressed: (ctx) {},
-                                icon: Icons.delete,
-                                label: 'Delete',
-                                backgroundColor: Colors.black,
-                              ),
-                            ],
-                          ),
-                          child: Card(
-                            color: Primary_green,
-                            child: ListTile(
-                              title: Text(
-                                '${Timeofwaterdrunk.hour}:${Timeofwaterdrunk.minute}',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w600,
+                isLoading
+                    ? LoadingScreen()
+                    : Container(
+                        height: 500,
+                        child: ListView.separated(
+                            itemBuilder: (BuildContext, index) {
+                              final _Waters = WaterListed[index];
+                              return Slidable(
+                                key: Key(_Waters.id!),
+                                startActionPane: ActionPane(
+                                  motion: const StretchMotion(),
+                                  children: [
+                                    SlidableAction(
+                                      onPressed: (ctx) {
+                                        setState(() {
+                                          isLoading = true;
+                                        });
+
+                                        WaterDB().deleteWater(_Waters.id!,
+                                            ParsedateDB(_selectedDate));
+                                        WaterDB()
+                                            .getList(ParsedateDB(_selectedDate))
+                                            .then((value) {
+                                          setState(() {
+                                            WaterListed = value;
+                                            isLoading = false;
+                                          });
+                                        });
+                                      },
+                                      icon: Icons.delete,
+                                      label: 'Delete',
+                                      backgroundColor: Colors.black,
+                                    ),
+                                  ],
                                 ),
-                              ),
-                              trailing: Text(
-                                '1 Glass',
-                                style: TextStyle(
-                                  color: Color(0xFF6F6F6F),
-                                  fontWeight: FontWeight.w900,
-                                  fontSize: 16,
+                                child: Card(
+                                  color: Primary_green,
+                                  child: ListTile(
+                                    title: Text(
+                                      _Waters.wtime!,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    trailing: Text(
+                                      _Waters.Glass!,
+                                      style: TextStyle(
+                                        color: Color(0xFF6F6F6F),
+                                        fontWeight: FontWeight.w900,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                      separatorBuilder: (context, int) {
-                        return const SizedBox(
-                          width: 10,
-                        );
-                      },
-                      itemCount: 10),
-                ),
+                              );
+                            },
+                            separatorBuilder: (context, int) {
+                              return const SizedBox(
+                                width: 10,
+                              );
+                            },
+                            itemCount: WaterListed.length),
+                      ),
                 Padding(
                   padding: const EdgeInsets.all(6.0),
                   child: SizedBox(

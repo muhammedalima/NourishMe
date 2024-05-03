@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:get/get.dart';
 import 'package:nourish_me/screens/home/home_screen.dart';
+import 'package:nourish_me/screens/home_page/widgets/home_widgets.dart';
 import 'package:nourish_me/screens/secondarynavpages/widgets/secondarypagewidgets.dart';
 import 'package:nourish_me/theme_library/theme_library.dart';
 import 'package:intl/intl.dart';
+import 'package:nourish_me/database/databasecalories.dart';
 
 class CaloriesPage extends StatefulWidget {
   const CaloriesPage({super.key});
@@ -13,10 +16,30 @@ class CaloriesPage extends StatefulWidget {
 }
 
 class _CaloriesPageState extends State<CaloriesPage> {
+  final NameController = TextEditingController();
   DateTime _selectedDate = DateTime.now();
   String PrintedDate = 'Today';
+
   String Parsedate(DateTime date) {
     return '${DateFormat.d().format(date)} ${DateFormat.MMM().format(date)}';
+  }
+
+  String ParsedateDB(DateTime date) {
+    return '${DateFormat.yMMMd().format(date)}';
+  }
+
+  late List<CaloriesListItem> CalorieListed;
+  bool isLoading = true;
+  @override
+  void initState() {
+    isLoading = true;
+    CaloriesDB().getList(ParsedateDB(_selectedDate)).then((value) {
+      setState(() {
+        CalorieListed = value;
+        isLoading = false;
+      });
+    });
+    super.initState();
   }
 
   @override
@@ -58,11 +81,12 @@ class _CaloriesPageState extends State<CaloriesPage> {
                         child: IconButton(
                             icon: Icon(Icons.calendar_month),
                             onPressed: () async {
-                              final _selectedDatetemp = await showDatePicker(
+                              DateTime? selectedDatetemp = DateTime.now();
+                              selectedDatetemp = await showDatePicker(
                                 context: context,
                                 initialDate: DateTime.now(),
-                                firstDate:
-                                    DateTime.now().subtract(Duration(days: 30)),
+                                firstDate: DateTime.now()
+                                    .subtract(Duration(days: 365)),
                                 lastDate: DateTime.now(),
                                 builder: (BuildContext context, Widget) {
                                   return Theme(
@@ -80,10 +104,18 @@ class _CaloriesPageState extends State<CaloriesPage> {
 
                               setState(
                                 () {
-                                  if (_selectedDatetemp != DateTime.now()) {
-                                    _selectedDate = _selectedDatetemp!;
-
+                                  if (selectedDatetemp != DateTime.now()) {
+                                    _selectedDate = selectedDatetemp!;
                                     PrintedDate = Parsedate(_selectedDate);
+                                    isLoading = true;
+                                    CaloriesDB()
+                                        .getList(ParsedateDB(_selectedDate))
+                                        .then((value) {
+                                      setState(() {
+                                        CalorieListed = value;
+                                        isLoading = false;
+                                      });
+                                    });
                                   }
                                 },
                               );
@@ -119,6 +151,7 @@ class _CaloriesPageState extends State<CaloriesPage> {
                         children: [
                           Flexible(
                             child: TextFormField(
+                              controller: NameController,
                               decoration: const InputDecoration(
                                 border: InputBorder.none,
                                 hintText: 'Enter Food You Ate',
@@ -160,7 +193,41 @@ class _CaloriesPageState extends State<CaloriesPage> {
                             child: IconButton(
                               icon: const Icon(Icons.add),
                               color: Colors.white,
-                              onPressed: () {},
+                              onPressed: () async {
+                                try {
+                                  if (NameController.text.isEmpty) {
+                                    Get.snackbar(
+                                        "Error", "Please fill in all fields.",
+                                        colorText: Colors.black);
+                                    return;
+                                  } else {
+                                    setState(() {
+                                      isLoading = true;
+                                      CaloriesDB().addCalories(
+                                          NameController.text,
+                                          ParsedateDB(_selectedDate));
+                                      WidgetsBinding
+                                          .instance.focusManager.primaryFocus
+                                          ?.unfocus();
+                                      CaloriesDB()
+                                          .getList(ParsedateDB(_selectedDate))
+                                          .then((value) {
+                                        setState(() {
+                                          CalorieListed = value;
+                                          isLoading = false;
+                                          NameController.clear();
+
+                                          isLoading = false;
+                                        });
+                                      });
+                                    });
+                                  }
+                                } catch (e) {
+                                  Get.snackbar("Error", e.toString(),
+                                      colorText: Primary_green);
+                                }
+                                ;
+                              },
                             ),
                           ),
                         ],
@@ -170,51 +237,70 @@ class _CaloriesPageState extends State<CaloriesPage> {
                   const SizedBox(
                     height: 10,
                   ),
-                  Container(
-                    height: 500,
-                    child: ListView.separated(
-                        itemBuilder: (BuildContext, int) {
-                          return Slidable(
-                            key: const Key('1'),
-                            startActionPane: ActionPane(
-                              motion: const StretchMotion(),
-                              children: [
-                                SlidableAction(
-                                  onPressed: (ctx) {},
-                                  icon: Icons.delete,
-                                  label: 'Delete',
-                                  backgroundColor: Colors.black,
-                                ),
-                              ],
-                            ),
-                            child: Card(
-                              color: Primary_green,
-                              child: const ListTile(
-                                title: Text(
-                                  'Bread & Omlette',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w600,
+                  isLoading
+                      ? LoadingScreen()
+                      : Container(
+                          height: 500,
+                          child: ListView.separated(
+                              itemBuilder: (BuildContext, index) {
+                                final _Calories = CalorieListed[index];
+                                return Slidable(
+                                  key: Key(_Calories.id!),
+                                  startActionPane: ActionPane(
+                                    motion: const StretchMotion(),
+                                    children: [
+                                      SlidableAction(
+                                        onPressed: (ctx) {
+                                          setState(() {
+                                            isLoading = true;
+                                          });
+
+                                          CaloriesDB().deleteCalories(
+                                              _Calories.id!,
+                                              ParsedateDB(_selectedDate));
+                                          CaloriesDB()
+                                              .getList(
+                                                  ParsedateDB(_selectedDate))
+                                              .then((value) {
+                                            setState(() {
+                                              CalorieListed = value;
+                                              isLoading = false;
+                                            });
+                                          });
+                                        },
+                                        icon: Icons.delete,
+                                        label: 'Delete',
+                                        backgroundColor: Colors.black,
+                                      ),
+                                    ],
                                   ),
-                                ),
-                                trailing: Text(
-                                  '10kcal',
-                                  style: TextStyle(
-                                    color: Color(0xFF6F6F6F),
-                                    fontWeight: FontWeight.w900,
-                                    fontSize: 16,
+                                  child: Card(
+                                    color: Primary_green,
+                                    child: ListTile(
+                                      title: Text(
+                                        _Calories.name!,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      trailing: Text(
+                                        _Calories.calorie!,
+                                        style: TextStyle(
+                                          color: Color(0xFF6F6F6F),
+                                          fontWeight: FontWeight.w900,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                        separatorBuilder: (context, int) {
-                          return const SizedBox(
-                            width: 10,
-                          );
-                        },
-                        itemCount: 10),
-                  ),
+                                );
+                              },
+                              separatorBuilder: (context, int) {
+                                return const SizedBox(
+                                  width: 10,
+                                );
+                              },
+                              itemCount: CalorieListed.length)),
                   Padding(
                     padding: const EdgeInsets.all(6.0),
                     child: SizedBox(

@@ -8,9 +8,11 @@ class AddCard extends StatelessWidget {
   final String headingInsideCard;
   final String subHeadingCard;
   final Widget screens;
+  final double progressindex;
 
   const AddCard({
     super.key,
+    required this.progressindex,
     required this.headingTitle,
     required this.headingInsideCard,
     required this.subHeadingCard,
@@ -59,8 +61,8 @@ class AddCard extends StatelessWidget {
                         shape: BoxShape.circle,
                         color: Colors.black,
                       ),
-                      child: const CircularProgressIndicator(
-                        value: 0.3,
+                      child: CircularProgressIndicator(
+                        value: progressindex,
                         backgroundColor: Colors.white,
                         color: Colors.black,
                       ),
@@ -182,6 +184,20 @@ class SquareBox extends StatelessWidget {
             height: 15,
           ),
         ],
+      ),
+    );
+  }
+}
+
+class LoadingScreen extends StatelessWidget {
+  const LoadingScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Image.asset(
+        "assets/images/Loading.gif",
+        width: double.infinity,
       ),
     );
   }
