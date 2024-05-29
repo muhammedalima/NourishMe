@@ -51,7 +51,7 @@ class WaterDB implements userdatafunction {
       final userdetail =
           await databaseref.child('${user!.uid}/${_selectedDate}/Water').get();
       if (userdetail.exists) {
-        // Iterate through child nodes and fetch Glass information
+        // ignore: unused_local_variable
         int index = 0;
         for (final child in userdetail.children) {
           userDetails.add(await getWatervalue(child.key, _selectedDate));

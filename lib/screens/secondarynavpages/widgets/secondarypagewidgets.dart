@@ -8,7 +8,10 @@ import 'package:path_provider/path_provider.dart';
 import 'package:nourish_me/main.dart';
 
 class CameraAccessWidget extends StatefulWidget {
-  const CameraAccessWidget({Key? key}) : super(key: key);
+  DateTime? _selecteddate;
+  CameraAccessWidget(DateTime _DateTime) {
+    this._selecteddate = _DateTime;
+  }
 
   @override
   State<CameraAccessWidget> createState() => _CameraAccessWidgetState();
@@ -74,6 +77,7 @@ class _CameraAccessWidgetState extends State<CameraAccessWidget> {
                   cameraController.setFlashMode(FlashMode.off);
                   if (cameraController.value.isInitialized) {
                     final image = await cameraController.takePicture();
+                    final bytes = await image.readAsBytes();
                     log("image $image");
                     final File clickedImage = File(image.path);
                     final tempDir = await getTemporaryDirectory();
@@ -88,8 +92,7 @@ class _CameraAccessWidgetState extends State<CameraAccessWidget> {
                     Navigator.of(context).push(
                       MaterialPageRoute(
                           builder: (context) => ImageCaloriesPage(
-                                imagefile: localImage,
-                              )),
+                              imagefile: localImage, imageinbytes: bytes)),
                     );
                   }
                 } catch (e) {

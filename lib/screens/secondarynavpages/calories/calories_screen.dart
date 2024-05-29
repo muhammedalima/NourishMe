@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
@@ -203,21 +205,24 @@ class _CaloriesPageState extends State<CaloriesPage> {
                                   } else {
                                     setState(() {
                                       isLoading = true;
-                                      CaloriesDB().addCalories(
-                                          NameController.text,
-                                          ParsedateDB(_selectedDate));
-                                      WidgetsBinding
-                                          .instance.focusManager.primaryFocus
-                                          ?.unfocus();
+                                    });
+                                    await CaloriesDB()
+                                        .addCalories(
+                                            NameController.text,
+                                            ParsedateDB(_selectedDate),
+                                            CalorieListed)
+                                        .then((value) {
                                       CaloriesDB()
                                           .getList(ParsedateDB(_selectedDate))
                                           .then((value) {
                                         setState(() {
-                                          CalorieListed = value;
-                                          isLoading = false;
                                           NameController.clear();
 
                                           isLoading = false;
+
+                                          WidgetsBinding.instance.focusManager
+                                              .primaryFocus
+                                              ?.unfocus();
                                         });
                                       });
                                     });
@@ -254,17 +259,19 @@ class _CaloriesPageState extends State<CaloriesPage> {
                                           setState(() {
                                             isLoading = true;
                                           });
-
-                                          CaloriesDB().deleteCalories(
-                                              _Calories.id!,
-                                              ParsedateDB(_selectedDate));
+                                          print(_Calories.id);
                                           CaloriesDB()
-                                              .getList(
+                                              .deleteCalories(_Calories.id!,
                                                   ParsedateDB(_selectedDate))
                                               .then((value) {
-                                            setState(() {
-                                              CalorieListed = value;
-                                              isLoading = false;
+                                            CaloriesDB()
+                                                .getList(
+                                                    ParsedateDB(_selectedDate))
+                                                .then((value) {
+                                              setState(() {
+                                                CalorieListed = value;
+                                                isLoading = false;
+                                              });
                                             });
                                           });
                                         },

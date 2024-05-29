@@ -2,13 +2,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:nourish_me/geminiapi/gemini.dart';
 import 'package:nourish_me/theme_library/theme_library.dart';
 
 final databaseref = FirebaseDatabase.instance.ref('UserDetails');
 final user = FirebaseAuth.instance.currentUser;
 
 abstract class userdatafunction {
-  Future<void> addCalories(String name, String _selectedDate);
+  Future<void> addCalories(
+      String name, String _selectedDate, List<CaloriesListItem> CalorieListed);
   Future<CaloriesListItem> getCaloriesvalue(String Value, String _selectedDate);
   Future<List<CaloriesListItem>> getList(String _selectedDate);
 }
@@ -52,7 +54,6 @@ class CaloriesDB implements userdatafunction {
           .child('${user!.uid}/${_selectedDate}/calories')
           .get();
       if (userdetail.exists) {
-        // Iterate through child nodes and fetch calorie information
         // ignore: unused_local_variable
         int index = 0;
         for (final child in userdetail.children) {
@@ -89,16 +90,20 @@ class CaloriesDB implements userdatafunction {
   }
 
   @override
-  Future<void> addCalories(String name, String _selectedDate) async {
+  Future<void> addCalories(String name, String _selectedDate,
+      List<CaloriesListItem> CalorieListed) async {
+    String? Calories;
     try {
+      Calories = await await Geminifunction().Caloriesvalue('$name');
       await databaseref
           .child(
               '${user!.uid}/${_selectedDate}/calories/${(DateTime.now().millisecondsSinceEpoch).toString()}')
           .set({
         'id': '${(DateTime.now().millisecondsSinceEpoch).toString()}',
         'name': name,
-        'Calories': '20',
+        'calorie': Calories,
       });
+      CalorieListed = await getList(_selectedDate);
       print('UserDetails added successfully with email: ${user!.email}');
     } on FirebaseAuthException catch (e) {
       Get.snackbar("Error", e.code, colorText: Primary_green);
@@ -112,8 +117,7 @@ class CaloriesDB implements userdatafunction {
       await databaseref
           .child('${user!.uid}/${_selectedDate}/calories/${id}')
           .remove();
-      // await RefreshData();
-      print('UserDetails added successfully with email: ${user!.email}');
+      print('UserDetails deleted successfully with email: ${user!.email}');
     } on FirebaseAuthException catch (e) {
       Get.snackbar("Error", e.code, colorText: Primary_green);
     } catch (error) {

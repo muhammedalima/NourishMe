@@ -43,10 +43,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   getData() {
     name = getName();
-    weight = getWeight();
     height = getHeight();
     gender = getGender();
     bmi = getbmi();
+    weight = getWeight();
     tweight = getTWeight();
   }
 
