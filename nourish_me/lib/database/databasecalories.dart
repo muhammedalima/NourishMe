@@ -53,6 +53,7 @@ class CaloriesDB implements userdatafunction {
           .get();
       if (userdetail.exists) {
         // Iterate through child nodes and fetch calorie information
+        // ignore: unused_local_variable
         int index = 0;
         for (final child in userdetail.children) {
           userDetails.add(await getCaloriesvalue(child.key, _selectedDate));
