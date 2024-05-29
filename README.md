@@ -1,6 +1,12 @@
-# nourish_me
+# Nourish Me
 
-A new Flutter project.
+NourishMe, a health & wellness app for personalized calorie tracking and weight management.
+- Leverages goal-based (Weight gain,loss etc..)  calorie calculations.
+- Integrates a chatbot 
+- Offers comprehensive tracking features: calories (manual input & image recognition), exercise duration, and water intake.
+- All CRUD Operations are include.
+- Database used is firebase
+
 
 ## Getting Started
 
