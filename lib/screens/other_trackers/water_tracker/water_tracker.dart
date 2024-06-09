@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:nourish_me/functions/repeatfunction.dart';
 import 'package:nourish_me/screens/home/home_screen.dart';
 import 'package:nourish_me/screens/home_page/widgets/home_widgets.dart';
 import 'package:nourish_me/screens/other_trackers/water_tracker/databasewater.dart';
-import 'package:nourish_me/theme_library/theme_library.dart';
+import 'package:nourish_me/constants/Constants.dart';
 
 class WaterTracker extends StatefulWidget {
   const WaterTracker({super.key});
@@ -26,10 +27,6 @@ class _WaterTrackerState extends State<WaterTracker> {
 
   String ParseTime(DateTime date) {
     return '${DateFormat.jm().format(date)}';
-  }
-
-  String ParsedateDB(DateTime date) {
-    return '${DateFormat.yMMMd().format(date)}';
   }
 
   late List<WaterListItem> WaterListed;

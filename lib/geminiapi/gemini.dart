@@ -1,12 +1,13 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:nourish_me/constants/Constants.dart';
 
 class Geminifunction {
   Geminifunction()
       : _model = GenerativeModel(
           model: 'gemini-1.5-flash-latest',
-          apiKey: 'AIzaSyAsKT6BMedNILln1Jb7NerLcGeqESvfW1k',
+          apiKey: Geminiapi,
         );
 
   final GenerativeModel _model;
@@ -15,10 +16,15 @@ class Geminifunction {
     String? calories;
     try {
       final calories = await FoodCalories(name);
+      print('${calories} after final calories');
       if (calories == null) {
         print('error');
       }
       if (jsonDecode(calories!) case {'Calories': String items}) {
+        print('${items} inside print items');
+        if (items == "```") {
+          return '80';
+        }
         return items;
       }
       throw const GeminierrorException('Invalid JSON schema');
@@ -29,10 +35,9 @@ class Geminifunction {
     } catch (e) {
       if (e is GeminierrorException) rethrow;
 
-      print(calories);
+      print('${calories} inside error');
       print(e);
-      return '200';
-      // throw const GeminierrorException();
+      return '60';
     }
   }
 
@@ -58,17 +63,16 @@ class Geminifunction {
   }
 
   Future<String?> FoodCalories(String name) async {
-    final prompt =
-        'You are a calories finder where you find the calories of food by just name.'
-        'You have given the $name find the calories.'
-        //'You have too give only the average one value'
-        //'Your value must be constant'
-        'You doesnt find the calories give your response as error'
-        'Provide your response as a JSON object with the following schema: {"Calories": ""}';
-    'Do not return your result as Markdown.';
-
+    print('hello');
+    final prompt = 'You are a calories finder.'
+        'You have given the ${name} find the calories.'
+        'You have too give only the average one value.'
+        'Your value must be constant.'
+        'You doesnt find the calories give your response as error.'
+        'Provide your response as a JSON object with the following schema: {"Calories": ""}.'
+        'Do not return your result as Markdown.';
+    print(prompt);
     final response = await _model.generateContent([Content.text(prompt)]);
-
     return response.text;
   }
 
@@ -96,21 +100,3 @@ class GeminierrorException implements Exception {
   @override
   String toString() => 'GeminierrorException: $message';
 }
-
-/*
-
-Future<Uint8List> takePhoto() async {
-    try {
-      final photo = await imagePicker.pickImage(source: ImageSource.camera);
-
-      if (photo == null) throw const PhotoPickerException();
-
-      final bytes = await photo.readAsBytes();
-
-      return bytes;
-    } on Exception {
-      throw const PhotoPickerException();
-    }
-  }
-
-*/

@@ -3,16 +3,17 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:nourish_me/screens/secondarynavpages/calories/image_calories_screen.dart';
-import 'package:nourish_me/theme_library/theme_library.dart';
+import 'package:nourish_me/constants/Constants.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:nourish_me/main.dart';
 
+// ignore: must_be_immutable
 class CameraAccessWidget extends StatefulWidget {
-  DateTime? _selecteddate;
-  CameraAccessWidget(DateTime _DateTime) {
-    this._selecteddate = _DateTime;
-  }
-
+  final DateTime? selectedDate;
+  CameraAccessWidget({
+    super.key,
+    required this.selectedDate,
+  });
   @override
   State<CameraAccessWidget> createState() => _CameraAccessWidgetState();
 }
@@ -91,8 +92,12 @@ class _CameraAccessWidgetState extends State<CameraAccessWidget> {
                     });
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                          builder: (context) => ImageCaloriesPage(
-                              imagefile: localImage, imageinbytes: bytes)),
+                        builder: (context) => ImageCaloriesPage(
+                          imagefile: localImage,
+                          imageinbytes: bytes,
+                          selectedDate: widget.selectedDate!,
+                        ),
+                      ),
                     );
                   }
                 } catch (e) {

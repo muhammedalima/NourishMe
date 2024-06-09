@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:get/get.dart';
-import 'package:nourish_me/theme_library/theme_library.dart';
+import 'package:nourish_me/constants/Constants.dart';
 
 final databaseref = FirebaseDatabase.instance.ref('User');
 final user = FirebaseAuth.instance.currentUser;
@@ -15,8 +15,8 @@ abstract class userdatafunction {
   Future<void> addCurrentWeight(
     String weight,
   );
-  Future<void> addUserDetail(
-      String name, String weight, String tweight, String height, String gender);
+  Future<void> addUserDetail(String name, String weight, String tweight,
+      String height, String age, String gender);
 }
 
 class UserDB implements userdatafunction {
@@ -33,6 +33,10 @@ class UserDB implements userdatafunction {
   String? _bmi;
   String? _gender;
   String _tweight = '20';
+  String? _age;
+  String? _Calorie;
+  String? _exersice;
+  String? _noofday;
 
   Future<List<String>> getUserDetails() async {
     List<String> userDetails = [];
@@ -46,7 +50,15 @@ class UserDB implements userdatafunction {
           userdetail.child('gender').value.toString(),
           userdetail.child('bmi').value.toString(),
           userdetail.child('tweight').value.toString(),
+          userdetail.child('age').value.toString(),
+          userdetail.child('exercise').value.toString(),
+          userdetail.child('noofday').value.toString(),
         ]);
+        final Calories = '60';
+        addCaloriesInside(Calories);
+        userDetails.add(
+          userdetail.child('Calorie').value.toString(),
+        );
       }
     } catch (error) {
       print('Error getting user details: $error');
@@ -54,9 +66,25 @@ class UserDB implements userdatafunction {
     return userDetails;
   }
 
+  Future<void> addCaloriesInside(
+    String Calories,
+  ) async {
+    try {
+      await databaseref.child('${user!.uid}/Calorie').set(
+            Calories,
+          );
+      print('Refreshed Calorie added successfully with email: ${user!.email}');
+    } on FirebaseAuthException catch (e) {
+      Get.snackbar("Error", e.code, colorText: Primary_green);
+    } catch (error) {
+      print('Error adding name: $error');
+    }
+  }
+
   @override
   Future<void> RefreshData() async {
     final userDetails = await getUserDetails();
+
     if (userDetails.isNotEmpty) {
       _name = userDetails[0];
       _height = userDetails[1];
@@ -64,15 +92,70 @@ class UserDB implements userdatafunction {
       _gender = userDetails[3];
       _bmi = userDetails[4];
       _tweight = userDetails[5];
+      _age = userDetails[6];
+      _exersice = userDetails[7];
+      _noofday = userDetails[8];
+      _Calorie = userDetails[9];
     } else {
       return null;
     }
   }
 
+  double BMR(String weight, String height, String age, String gender) {
+    double bmr;
+    if (gender == 'Male') {
+      bmr = ((13.75 * double.parse(weight)) +
+          (5.003 * double.parse(height)) -
+          (6.75 * double.parse(age)) +
+          66.5);
+    } else {
+      bmr = ((9.563 * double.parse(weight)) +
+          (1.850 * double.parse(height)) -
+          (4.676 * double.parse(age)) +
+          665.1);
+    }
+    return bmr;
+  }
+
+  double TTDE(String exercise, double bmr) {
+    double ttde;
+    if (exercise == 'ea') {
+      ttde = bmr * 1.9;
+    } else if (exercise == 'l') {
+      ttde = bmr * 1.2;
+    } else if (exercise == 'la') {
+      ttde = bmr * 1.375;
+    } else if (exercise == 'ma') {
+      ttde = bmr * 1.55;
+    } else if (exercise == 'va') {
+      ttde = bmr * 1.725;
+    } else
+      ttde = bmr;
+    return ttde;
+  }
+
   @override
   Future<void> addUserDetail(String name, String weight, String tweight,
-      String height, String gender) async {
+      String height, String age, String gender) async {
     try {
+      final String noofday;
+      final String exercise = 'l';
+      final String Calorie;
+      final bmr = BMR(weight, height, age, gender);
+      final ttde = TTDE(exercise, bmr);
+      final int weight_difference = int.parse(tweight) - int.parse(weight);
+      if (weight_difference > 0) {
+        Calorie = ((ttde * 110).round()).toString();
+
+        noofday = (weight_difference.round()).toString();
+      } else if (weight_difference < 0) {
+        Calorie = (ttde - 500).toString();
+        noofday = (((weight_difference * -1) * 0.453592).round()).toString();
+      } else {
+        Calorie = ttde.toString();
+        noofday = '0';
+      }
+
       final bmi = (10000 *
               (int.parse(weight) / (int.parse(height) * int.parse(height))))
           .round();
@@ -83,6 +166,10 @@ class UserDB implements userdatafunction {
         'gender': gender,
         'bmi': bmi,
         'tweight': tweight,
+        'age': age,
+        'exercise': exercise,
+        'noofday': noofday,
+        'Calorie': Calorie,
       });
       await RefreshData();
       print('UserDetails added successfully with email: ${user!.email}');
@@ -98,10 +185,7 @@ class UserDB implements userdatafunction {
     String weight,
   ) async {
     try {
-      await databaseref.child('${user!.uid}/tweight').set(
-            weight,
-          );
-      await RefreshData();
+      await addUserDetail(_name!, _weight, weight, _height!, _age!, _gender!);
       print('Target Weight added successfully with email: ${user!.email}');
     } on FirebaseAuthException catch (e) {
       Get.snackbar("Error", e.code, colorText: Primary_green);
@@ -115,10 +199,7 @@ class UserDB implements userdatafunction {
     String weight,
   ) async {
     try {
-      await databaseref.child('${user!.uid}/weight').set(
-            weight,
-          );
-      await RefreshData();
+      await addUserDetail(_name!, weight, _tweight, _height!, _age!, _gender!);
       print('Current Weight added successfully with email: ${user!.email}');
     } on FirebaseAuthException catch (e) {
       Get.snackbar("Error", e.code, colorText: Primary_green);
@@ -148,6 +229,22 @@ String getbmi() {
   return UserDB()._bmi!;
 }
 
+String getAge() {
+  return UserDB()._age!;
+}
+
 String getGender() {
   return UserDB()._gender!;
+}
+
+String getTotalCalorie() {
+  return UserDB()._Calorie!;
+}
+
+String getnoofday() {
+  return UserDB()._noofday!;
+}
+
+String getexercisetype() {
+  return UserDB()._exersice!;
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:nourish_me/theme_library/theme_library.dart';
+import 'package:nourish_me/constants/Constants.dart';
 import 'dart:math' as math;
 
 class AddCard extends StatelessWidget {
@@ -198,6 +198,25 @@ class LoadingScreen extends StatelessWidget {
       child: Image.asset(
         "assets/images/Loading.gif",
         width: double.infinity,
+      ),
+    );
+  }
+}
+
+class LineLoading extends StatelessWidget {
+  final double length;
+  final double height;
+  const LineLoading({super.key, required this.length, required this.height});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: length,
+      height: height,
+      child: Image.asset(
+        "assets/images/lineloading.gif",
+        width: double.infinity,
+        fit: BoxFit.fitWidth,
       ),
     );
   }

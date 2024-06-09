@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nourish_me/screens/home/home_screen.dart';
-import 'package:nourish_me/theme_library/theme_library.dart';
+import 'package:nourish_me/constants/Constants.dart';
 
 class BottomNav extends StatelessWidget {
   const BottomNav({super.key});

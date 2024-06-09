@@ -2,10 +2,11 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:nourish_me/database/databasecalories.dart';
+import 'package:nourish_me/functions/repeatfunction.dart';
 import 'package:nourish_me/geminiapi/gemini.dart';
 import 'package:nourish_me/screens/home_page/widgets/home_widgets.dart';
 import 'package:nourish_me/screens/secondarynavpages/calories/calories_screen.dart';
-import 'package:nourish_me/theme_library/theme_library.dart';
+import 'package:nourish_me/constants/Constants.dart';
 
 class ImageCaloriesPage extends StatefulWidget {
   final File imagefile;
@@ -207,15 +208,14 @@ class _ImageCaloriesPageState extends State<ImageCaloriesPage> {
                           ),
                           onPressed: () async {
                             await CaloriesDB()
-                                .addCalories(FoodName,
-                                    ParsedateDB(selectedDate))
+                                .addCalories(
+                                    FoodName, ParsedateDB(widget.selectedDate))
                                 .then((value) {
                               setState(() {
                                 isLoading = true;
                               });
                             });
                             setState(() {
-
                               isLoading = false;
 
                               WidgetsBinding.instance.focusManager.primaryFocus

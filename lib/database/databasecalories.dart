@@ -2,17 +2,27 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:nourish_me/database/databaseuser.dart';
+import 'package:nourish_me/functions/repeatfunction.dart';
 import 'package:nourish_me/geminiapi/gemini.dart';
-import 'package:nourish_me/theme_library/theme_library.dart';
+import 'package:nourish_me/constants/Constants.dart';
 
 final databaseref = FirebaseDatabase.instance.ref('UserDetails');
 final user = FirebaseAuth.instance.currentUser;
+final databasecal = FirebaseDatabase.instance.ref('caloriesvalue');
 
 abstract class userdatafunction {
   Future<void> addCalories(
-      String name, String _selectedDate, List<CaloriesListItem> CalorieListed);
+    String name,
+    String _selectedDate,
+  );
   Future<CaloriesListItem> getCaloriesvalue(String Value, String _selectedDate);
   Future<List<CaloriesListItem>> getList(String _selectedDate);
+  Future<void> addTodayCalorie(
+      String _selectedDate, String TodayCalories, String TargetCalorie);
+  Future<String> getTodayCalorie(String _selectedDate);
+  Future<String> getTargetCalorie(String _selectedDate);
+  Future<void> deleteCalories(String id, String _selectedDate);
 }
 
 class CaloriesListItem {
@@ -51,7 +61,7 @@ class CaloriesDB implements userdatafunction {
     List<CaloriesListItem> userDetails = [];
     try {
       final userdetail = await databaseref
-          .child('${user!.uid}/${_selectedDate}/calories')
+          .child('${user!.uid}/${_selectedDate}/calories/List/')
           .get();
       if (userdetail.exists) {
         // ignore: unused_local_variable
@@ -61,6 +71,21 @@ class CaloriesDB implements userdatafunction {
           index++;
         }
       }
+      late String todaycalorie;
+      int totalCalories = 0;
+
+      if (_selectedDate == ParsedateDB(DateTime.now())) {
+        todaycalorie = getTotalCalorie();
+        print('success inside add calorie sum finding');
+      } else {
+        todaycalorie = await getTodayCalorie(_selectedDate);
+      }
+      for (var item in userDetails) {
+        if (double.tryParse(item.calorie!) != null) {
+          totalCalories += int.parse(item.calorie!);
+        }
+      }
+      addTodayCalorie(_selectedDate, totalCalories.toString(), todaycalorie);
     } catch (error) {
       print('Error getting user details: $error');
     }
@@ -73,7 +98,7 @@ class CaloriesDB implements userdatafunction {
     CaloriesListItem userDetails = CaloriesListItem();
     try {
       final userdetail = await databaseref
-          .child('${user!.uid}/${_selectedDate}/calories/${Value}')
+          .child('${user!.uid}/${_selectedDate}/calories/List/${Value}')
           .get();
       if (userdetail.exists) {
         userDetails = CaloriesListItem(
@@ -90,20 +115,32 @@ class CaloriesDB implements userdatafunction {
   }
 
   @override
-  Future<void> addCalories(String name, String _selectedDate,
-      List<CaloriesListItem> CalorieListed) async {
+  Future<void> addCalories(
+    String name,
+    String _selectedDate,
+  ) async {
     String? Calories;
     try {
-      Calories = await await Geminifunction().Caloriesvalue('$name');
+      final databasecalories = await databasecal.get();
+      print(databasecalories);
+      String data = await databasecalories
+          .child('${name.toLowerCase()}')
+          .value
+          .toString();
+      if (data != 'null') {
+        Calories = data;
+      } else {
+        Calories = await await Geminifunction().Caloriesvalue('$name');
+      }
+      String time = DateTime.now().millisecondsSinceEpoch.toString();
       await databaseref
-          .child(
-              '${user!.uid}/${_selectedDate}/calories/${(DateTime.now().millisecondsSinceEpoch).toString()}')
+          .child('${user!.uid}/${_selectedDate}/calories/List/${time}')
           .set({
-        'id': '${(DateTime.now().millisecondsSinceEpoch).toString()}',
+        'id': '${time}',
         'name': name,
         'calorie': Calories,
       });
-      CalorieListed = await getList(_selectedDate);
+      getList(_selectedDate);
       print('UserDetails added successfully with email: ${user!.email}');
     } on FirebaseAuthException catch (e) {
       Get.snackbar("Error", e.code, colorText: Primary_green);
@@ -112,16 +149,76 @@ class CaloriesDB implements userdatafunction {
     }
   }
 
+  @override
   Future<void> deleteCalories(String id, String _selectedDate) async {
     try {
       await databaseref
-          .child('${user!.uid}/${_selectedDate}/calories/${id}')
+          .child('${user!.uid}/${_selectedDate}/calories/List/${id}')
           .remove();
+      print(id);
       print('UserDetails deleted successfully with email: ${user!.email}');
     } on FirebaseAuthException catch (e) {
       Get.snackbar("Error", e.code, colorText: Primary_green);
     } catch (error) {
       print('Error adding name: $error');
     }
+  }
+
+  @override
+  Future<void> addTodayCalorie(
+      String _selectedDate, String TodayCalories, String TargetCalorie) async {
+    try {
+      await databaseref
+          .child('${user!.uid}/${_selectedDate}/calories/today')
+          .set({
+        'todayCalorie': TodayCalories,
+        'targetCalorie': TargetCalorie,
+      });
+      print('today calories is added');
+    } catch (e) {
+      print('error in adding today calories');
+      throw e;
+    }
+  }
+
+  @override
+  Future<String> getTodayCalorie(String _selectedDate) async {
+    late String Values;
+
+    try {
+      final calories = await databaseref
+          .child('${user!.uid}/${_selectedDate}/calories/today/')
+          .get();
+
+      if (calories.exists) {
+        Values = calories.child('todayCalorie').value.toString();
+      } else {
+        Values = '0';
+      }
+    } catch (e) {
+      print('error in geting  today calories');
+      throw e;
+    }
+    return Values;
+  }
+
+  @override
+  Future<String> getTargetCalorie(String _selectedDate) async {
+    late String Values;
+    try {
+      final calories = await databaseref
+          .child('${user!.uid}/${_selectedDate}/calories/today/')
+          .get();
+
+      if (calories.exists) {
+        Values = calories.child('targetCalorie').value.toString();
+        print('target working');
+        return Values;
+      }
+    } catch (e) {
+      print('error in geting target calories');
+      throw e;
+    }
+    return '0';
   }
 }

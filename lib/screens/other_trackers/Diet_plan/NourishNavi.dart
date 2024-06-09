@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gemini/flutter_gemini.dart';
-import 'package:nourish_me/theme_library/theme_library.dart';
+import 'package:nourish_me/constants/Constants.dart';
 
 class NourishNavi extends StatefulWidget {
   const NourishNavi({super.key});

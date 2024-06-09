@@ -4,19 +4,23 @@ import 'package:flutter_gemini/flutter_gemini.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:nourish_me/constants/Constants.dart';
+import 'package:nourish_me/firebase_options.dart';
 import 'package:nourish_me/screens/splash_screen.dart';
 
 late List<CameraDescription> cameras;
 
 void main() async {
   Gemini.init(
-    apiKey: 'AIzaSyAsKT6BMedNILln1Jb7NerLcGeqESvfW1k',
+    apiKey: Geminiapi,
   );
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
   cameras = await availableCameras();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(
-    const NourishMe(),
+    NourishMe(),
   );
 }
 

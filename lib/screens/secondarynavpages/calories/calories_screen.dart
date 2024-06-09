@@ -1,12 +1,10 @@
-// ignore_for_file: deprecated_member_use
-
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
 import 'package:nourish_me/screens/home/home_screen.dart';
 import 'package:nourish_me/screens/home_page/widgets/home_widgets.dart';
 import 'package:nourish_me/screens/secondarynavpages/widgets/secondarypagewidgets.dart';
-import 'package:nourish_me/theme_library/theme_library.dart';
+import 'package:nourish_me/constants/Constants.dart';
 import 'package:intl/intl.dart';
 import 'package:nourish_me/database/databasecalories.dart';
 
@@ -30,14 +28,23 @@ class _CaloriesPageState extends State<CaloriesPage> {
     return '${DateFormat.yMMMd().format(date)}';
   }
 
+  String todaycalorie = '';
+  String targetcalorie = '';
   late List<CaloriesListItem> CalorieListed;
+  getvalues() async {
+    CalorieListed = await CaloriesDB().getList(ParsedateDB(_selectedDate));
+    todaycalorie =
+        await CaloriesDB().getTodayCalorie(ParsedateDB(_selectedDate));
+    targetcalorie =
+        await CaloriesDB().getTargetCalorie(ParsedateDB(_selectedDate));
+  }
+
   bool isLoading = true;
   @override
   void initState() {
     isLoading = true;
-    CaloriesDB().getList(ParsedateDB(_selectedDate)).then((value) {
+    getvalues().then((value) {
       setState(() {
-        CalorieListed = value;
         isLoading = false;
       });
     });
@@ -46,13 +53,12 @@ class _CaloriesPageState extends State<CaloriesPage> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) {
         Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => HomeScreen()),
-          (Route<dynamic> route) => false,
-        );
-        return false;
+            MaterialPageRoute(builder: (context) => HomeScreen()),
+            (Route<dynamic> route) => false);
       },
       child: Scaffold(
         appBar: AppBar(
@@ -72,61 +78,93 @@ class _CaloriesPageState extends State<CaloriesPage> {
                     height: 20,
                   ),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Ink(
-                        width: 40,
-                        decoration: const ShapeDecoration(
-                          color: Color(0xFFC0DB3F),
-                          shape: CircleBorder(),
-                        ),
-                        child: IconButton(
-                            icon: Icon(Icons.calendar_month),
-                            onPressed: () async {
-                              DateTime? selectedDatetemp = DateTime.now();
-                              selectedDatetemp = await showDatePicker(
-                                context: context,
-                                initialDate: DateTime.now(),
-                                firstDate: DateTime.now()
-                                    .subtract(Duration(days: 365)),
-                                lastDate: DateTime.now(),
-                                builder: (BuildContext context, Widget) {
-                                  return Theme(
-                                    data: ThemeData.light().copyWith(
-                                      primaryColor: Primary_green,
-                                      colorScheme: ColorScheme.light(
-                                          primary: Primary_green),
-                                      buttonTheme: ButtonThemeData(
-                                          textTheme: ButtonTextTheme.primary),
-                                    ),
-                                    child: Widget!,
-                                  );
-                                },
-                              );
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            height: 20,
+                          ),
+                          Text(
+                            'Calories You Intaken',
+                            style: TextStyle(
+                              color: Colors.white,
+                            ),
+                          ),
+                          isLoading
+                              ? LineLoading(length: 160, height: 60)
+                              : Text(
+                                  '${todaycalorie}/${targetcalorie}',
+                                  style: TextStyle(
+                                    color: Primary_voilet,
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 40,
+                                  ),
+                                ),
+                        ],
+                      ),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Ink(
+                              width: 40,
+                              decoration: const ShapeDecoration(
+                                color: Color(0xFFC0DB3F),
+                                shape: CircleBorder(),
+                              ),
+                              child: IconButton(
+                                  icon: Icon(Icons.calendar_month),
+                                  onPressed: () async {
+                                    DateTime? selectedDatetemp = DateTime.now();
+                                    selectedDatetemp = await showDatePicker(
+                                      context: context,
+                                      initialDate: DateTime.now(),
+                                      firstDate: DateTime.now()
+                                          .subtract(Duration(days: 365)),
+                                      lastDate: DateTime.now(),
+                                      builder: (BuildContext context, Widget) {
+                                        return Theme(
+                                          data: ThemeData.light().copyWith(
+                                            primaryColor: Primary_green,
+                                            colorScheme: ColorScheme.light(
+                                                primary: Primary_green),
+                                            buttonTheme: ButtonThemeData(
+                                                textTheme:
+                                                    ButtonTextTheme.primary),
+                                          ),
+                                          child: Widget!,
+                                        );
+                                      },
+                                    );
 
-                              setState(
-                                () {
-                                  if (selectedDatetemp != DateTime.now()) {
-                                    _selectedDate = selectedDatetemp!;
-                                    PrintedDate = Parsedate(_selectedDate);
-                                    isLoading = true;
-                                    CaloriesDB()
-                                        .getList(ParsedateDB(_selectedDate))
-                                        .then((value) {
-                                      setState(() {
-                                        CalorieListed = value;
-                                        isLoading = false;
-                                      });
-                                    });
-                                  }
-                                },
-                              );
-                            }),
+                                    setState(
+                                      () {
+                                        if (selectedDatetemp !=
+                                            DateTime.now()) {
+                                          _selectedDate = selectedDatetemp!;
+                                          PrintedDate =
+                                              Parsedate(_selectedDate);
+                                          isLoading = true;
+                                          getvalues().then((value) {
+                                            setState(() {
+                                              isLoading = false;
+                                            });
+                                          });
+                                        }
+                                      },
+                                    );
+                                  }),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
                   SizedBox(
-                    height: 40,
+                    height: 20,
                   ),
                   Text(
                     'Update Calories of ${PrintedDate}',
@@ -177,8 +215,9 @@ class _CaloriesPageState extends State<CaloriesPage> {
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) =>
-                                          CameraAccessWidget(),
+                                      builder: (context) => CameraAccessWidget(
+                                        selectedDate: _selectedDate,
+                                      ),
                                     ));
                               },
                             ),
@@ -205,24 +244,20 @@ class _CaloriesPageState extends State<CaloriesPage> {
                                   } else {
                                     setState(() {
                                       isLoading = true;
+                                      WidgetsBinding
+                                          .instance.focusManager.primaryFocus
+                                          ?.unfocus();
                                     });
                                     await CaloriesDB()
                                         .addCalories(
-                                            NameController.text,
-                                            ParsedateDB(_selectedDate),
-                                            CalorieListed)
+                                      NameController.text,
+                                      ParsedateDB(_selectedDate),
+                                    )
                                         .then((value) {
-                                      CaloriesDB()
-                                          .getList(ParsedateDB(_selectedDate))
-                                          .then((value) {
+                                      getvalues().then((value) {
                                         setState(() {
                                           NameController.clear();
-
                                           isLoading = false;
-
-                                          WidgetsBinding.instance.focusManager
-                                              .primaryFocus
-                                              ?.unfocus();
                                         });
                                       });
                                     });
@@ -245,7 +280,7 @@ class _CaloriesPageState extends State<CaloriesPage> {
                   isLoading
                       ? LoadingScreen()
                       : Container(
-                          height: 500,
+                          height: 450,
                           child: ListView.separated(
                               itemBuilder: (BuildContext, index) {
                                 final _Calories = CalorieListed[index];
@@ -264,12 +299,8 @@ class _CaloriesPageState extends State<CaloriesPage> {
                                               .deleteCalories(_Calories.id!,
                                                   ParsedateDB(_selectedDate))
                                               .then((value) {
-                                            CaloriesDB()
-                                                .getList(
-                                                    ParsedateDB(_selectedDate))
-                                                .then((value) {
+                                            getvalues().then((value) {
                                               setState(() {
-                                                CalorieListed = value;
                                                 isLoading = false;
                                               });
                                             });

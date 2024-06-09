@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nourish_me/screens/other_trackers/Diet_plan/NourishNavi.dart';
-import 'package:nourish_me/theme_library/theme_library.dart';
+import 'package:nourish_me/constants/Constants.dart';
 
 class DietPlaner extends StatelessWidget {
   const DietPlaner({super.key});

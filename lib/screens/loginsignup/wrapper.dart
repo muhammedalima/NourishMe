@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:nourish_me/database/databaseuser.dart';
 import 'package:nourish_me/screens/home/home_screen.dart';
 import 'package:nourish_me/screens/loginsignup/login_page.dart';
 
@@ -18,6 +19,9 @@ class _WrapperState extends State<Wrapper> {
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
+            UserDB().RefreshData().then((value) {
+              return HomeScreen();
+            });
             return HomeScreen();
           } else {
             return LoginScreen();

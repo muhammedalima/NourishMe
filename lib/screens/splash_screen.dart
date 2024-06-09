@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:nourish_me/database/databaseuser.dart';
 import 'package:nourish_me/screens/loginsignup/wrapper.dart';
-import 'package:nourish_me/theme_library/theme_library.dart';
+import 'package:nourish_me/constants/Constants.dart';
 
 class splashScreen extends StatefulWidget {
   const splashScreen({super.key});
@@ -16,7 +15,6 @@ class _splash_screenState extends State<splashScreen>
   @override
   void initState() {
     super.initState();
-    UserDB().RefreshData();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
     Future.delayed(
       const Duration(seconds: 4),

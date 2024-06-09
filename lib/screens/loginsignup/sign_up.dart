@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nourish_me/screens/loginsignup/login_page.dart';
 import 'package:nourish_me/screens/loginsignup/wrapper.dart';
-import 'package:nourish_me/theme_library/theme_library.dart';
+import 'package:nourish_me/constants/Constants.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});

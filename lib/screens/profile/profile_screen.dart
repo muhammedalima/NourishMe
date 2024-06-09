@@ -1,10 +1,9 @@
-import 'package:dropdown_textfield/dropdown_textfield.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nourish_me/database/databaseuser.dart';
 import 'package:nourish_me/screens/home_page/widgets/home_widgets.dart';
-import 'package:nourish_me/theme_library/theme_library.dart';
+import 'package:nourish_me/constants/Constants.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -19,7 +18,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final namecontroller = TextEditingController();
   final heightcontroller = TextEditingController();
   final weightcontroller = TextEditingController();
-  final gendercontroller = SingleValueDropDownController();
+  final gendercontroller = TextEditingController();
+  final agecontroller = TextEditingController();
+  final List<String> list = <String>['Male', 'Female'];
   final List<String> _image = [
     'UnderWeight',
     'NormalWeight',
@@ -35,11 +36,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     Colors.pink,
   ];
   late int id;
+  late String age;
   late String weight;
   late String height;
   late String bmi;
   late String gender;
   late String tweight;
+  late String noofday;
 
   getData() {
     name = getName();
@@ -48,6 +51,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
     bmi = getbmi();
     weight = getWeight();
     tweight = getTWeight();
+    age = getAge();
+    if (int.parse(bmi) < 18.5) {
+      id = 0;
+    } else if (int.parse(bmi) < 25) {
+      id = 1;
+    } else if (int.parse(bmi) < 30) {
+      id = 2;
+    } else if (int.parse(bmi) < 40) {
+      id = 3;
+    } else {
+      id = 4;
+    }
+    noofday = getnoofday();
   }
 
   singout() async {
@@ -64,18 +80,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     UserDB().RefreshData().whenComplete(() {
       getData();
       setState(() {
-        if (int.parse(bmi) < 18.5) {
-          id = 0;
-        } else if (int.parse(bmi) < 25) {
-          id = 1;
-        } else if (int.parse(bmi) < 30) {
-          id = 2;
-        } else if (int.parse(bmi) < 40) {
-          id = 3;
-        } else {
-          id = 4;
-        }
-
         isLoading = false;
       });
     });
@@ -114,7 +118,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   height: 150,
                                   child: Row(
                                     mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceEvenly,
                                     children: [
                                       Image.asset(
                                         "assets/images/${gender == 'Male' ? 'Man' : 'Women'}${_image[id]}.png",
@@ -141,8 +145,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                 fontWeight: FontWeight.bold,
                                               ),
                                             ),
-                                            Text(
-                                              'You Are ${_image[id]}',
+                                            Flexible(
+                                              child: Text(
+                                                'You Are ${_image[id]}',
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -155,6 +161,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                               ],
                             ),
+                      edit
+                          ? SizedBox()
+                          : (noofday != '0')
+                              ? Text(
+                                  'it take ${noofday}days you to get target weight',
+                                  style: TextStyle(color: Colors.yellow[200]),
+                                )
+                              : SizedBox(),
                       Text(
                         'Name',
                         style: TextStyle(
@@ -398,77 +412,126 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       SizedBox(
                         height: 20,
                       ),
-                      Text(
-                        'Gender',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                        ),
-                      ),
-                      Container(
-                        margin: const EdgeInsets.all(
-                          6,
-                        ),
-                        height: 50,
-                        decoration: ShapeDecoration(
-                          shape: RoundedRectangleBorder(
-                            side:
-                                const BorderSide(width: 1, color: Colors.white),
-                            borderRadius: BorderRadius.circular(9),
-                          ),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: edit
-                              ? DropDownTextField(
-                                  textStyle: TextStyle(
-                                    color: Colors.white,
-                                  ),
-                                  listTextStyle: TextStyle(
-                                    color: Colors.white70,
-                                  ),
-                                  controller: gendercontroller,
-                                  clearOption: true,
-                                  dropdownColor: Colors.black,
-                                  textFieldDecoration: InputDecoration(
-                                    hintText: gender,
-                                    border: InputBorder.none,
-                                    fillColor: Colors.blue,
-                                  ),
-                                  validator: (value) {
-                                    if (value == null) {
-                                      return "Required field";
-                                    } else {
-                                      print(
-                                          gendercontroller.dropDownValue!.name);
-
-                                      return null;
-                                    }
-                                  },
-                                  dropDownItemCount: 2,
-                                  dropDownList: const [
-                                    DropDownValueModel(
-                                        name: 'Male', value: "Male"),
-                                    DropDownValueModel(
-                                      name: 'Female',
-                                      value: "Female",
-                                    ),
-                                  ],
-                                  onChanged: (val) {
-                                    setState(() {
-                                      print(val);
-                                    });
-                                  },
-                                )
-                              : Text(
-                                  gender,
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Age',
                                   style: TextStyle(
                                     color: Colors.white,
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.w900,
+                                    fontSize: 16,
                                   ),
                                 ),
-                        ),
+                                Container(
+                                  margin: const EdgeInsets.all(
+                                    6,
+                                  ),
+                                  height: 50,
+                                  width: double.infinity,
+                                  decoration: ShapeDecoration(
+                                    shape: RoundedRectangleBorder(
+                                      side: const BorderSide(
+                                          width: 1, color: Colors.white),
+                                      borderRadius: BorderRadius.circular(9),
+                                    ),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: edit
+                                        ? TextFormField(
+                                            keyboardType: TextInputType.number,
+                                            controller: agecontroller,
+                                            decoration: InputDecoration(
+                                              border: InputBorder.none,
+                                              hintText: age,
+                                              hintStyle: TextStyle(
+                                                color: Colors.white70,
+                                              ),
+                                            ),
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                            ),
+                                          )
+                                        : Text(
+                                            age,
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 24,
+                                              fontWeight: FontWeight.w900,
+                                            ),
+                                          ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Gender',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                Container(
+                                  margin: const EdgeInsets.all(6),
+                                  height: 50,
+                                  width: double.infinity,
+                                  decoration: ShapeDecoration(
+                                    shape: RoundedRectangleBorder(
+                                      side: const BorderSide(
+                                          width: 1, color: Colors.white),
+                                      borderRadius: BorderRadius.circular(9),
+                                    ),
+                                  ),
+                                  child: edit
+                                      ? Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 8.0),
+                                          child: DropdownMenu(
+                                            expandedInsets: EdgeInsets.zero,
+                                            controller: gendercontroller,
+                                            textStyle: TextStyle(
+                                              color: Colors.white,
+                                            ),
+                                            hintText: gender,
+                                            inputDecorationTheme:
+                                                InputDecorationTheme(
+                                              border: InputBorder.none,
+                                              hintStyle: TextStyle(
+                                                color: Colors.white70,
+                                              ),
+                                            ),
+                                            dropdownMenuEntries: list
+                                                .map<DropdownMenuEntry<String>>(
+                                                    (String value) {
+                                              return DropdownMenuEntry<String>(
+                                                  value: value, label: value);
+                                            }).toList(),
+                                          ),
+                                        )
+                                      : Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Text(
+                                            gender,
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 24,
+                                              fontWeight: FontWeight.w900,
+                                            ),
+                                          ),
+                                        ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                       SizedBox(
                         height: 20,
@@ -495,8 +558,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         if (namecontroller.text.isEmpty ||
                                             weightcontroller.text.isEmpty ||
                                             heightcontroller.text.isEmpty ||
-                                            gendercontroller.dropDownValue ==
-                                                null) {
+                                            agecontroller.text.isEmpty ||
+                                            gendercontroller.text.isEmpty) {
                                           Get.snackbar("Error",
                                               "Please fill in all fields.",
                                               colorText: Colors.black);
@@ -512,8 +575,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                   weightcontroller.text,
                                                   tweightcontroller.text,
                                                   heightcontroller.text,
-                                                  gendercontroller
-                                                      .dropDownValue!.value)
+                                                  agecontroller.text,
+                                                  gendercontroller.text)
                                               .whenComplete(() {
                                             setState(() {
                                               getData();
@@ -574,6 +637,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         ),
                       ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      edit
+                          ? SizedBox()
+                          : Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Note : This app restrict the intake addition food upto 500Kcal visit  https://news.sanfordhealth.org/healthy-living/weight-gain-performance/',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                  ),
+                                ),
+                              ],
+                            ),
                     ],
                   ),
                 ),

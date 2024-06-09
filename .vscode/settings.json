@@ -1,3 +1,8 @@
 {
-    "cmake.sourceDirectory": "/home/ali/miniproject/NourishMe/nourish_me/linux"
+    "cmake.sourceDirectory": "/home/ali/miniproject/NourishMe/nourish_me/linux",
+    "cmake.ignoreCMakeListsMissing": true,
+    "dart.devToolsBrowser": "default",
+    "liveServer.settings.AdvanceCustomBrowserCmdLine": "brave",
+    "liveServer.settings.ChromeDebuggingAttachment": true
+    
 }
