@@ -1,12 +1,14 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:nourish_me/database/databasecalories.dart';
 import 'package:nourish_me/functions/repeatfunction.dart';
 import 'package:nourish_me/geminiapi/gemini.dart';
 import 'package:nourish_me/screens/home_page/widgets/home_widgets.dart';
 import 'package:nourish_me/screens/secondarynavpages/calories/calories_screen.dart';
 import 'package:nourish_me/constants/Constants.dart';
+import 'package:nourish_me/screens/secondarynavpages/widgets/secondarypagewidgets.dart';
 
 class ImageCaloriesPage extends StatefulWidget {
   final File imagefile;
@@ -34,9 +36,8 @@ class _ImageCaloriesPageState extends State<ImageCaloriesPage> {
 
   setvalues() async {
     FoodName = await Geminifunction().FindName(widget.imageinbytes);
-    print(FoodName);
-    FinalCalories = await Geminifunction().Caloriesvalue('$FoodName');
-    return;
+
+    FinalCalories = await (CaloriesDB().checkcalories(FoodName)).toString();
   }
 
   @override
@@ -45,6 +46,18 @@ class _ImageCaloriesPageState extends State<ImageCaloriesPage> {
 
     setvalues().then((value) {
       setState(() {
+        if (FoodName == 'error' || FinalCalories == '0') {
+          Get.snackbar('Oops!', 'Take the correct image');
+          Navigator.pushAndRemoveUntil(
+            (context),
+            MaterialPageRoute(
+              builder: (context) => CameraAccessWidget(
+                selectedDate: widget.selectedDate,
+              ),
+            ),
+            (Route<dynamic> route) => true,
+          );
+        }
         Calories = FinalCalories;
         isLoading = false;
       });
@@ -185,7 +198,7 @@ class _ImageCaloriesPageState extends State<ImageCaloriesPage> {
                       height: 350,
                       child: SingleChildScrollView(
                         child: Text(
-                          'You Have Eaten ${Amount.toString()} ${FoodName} Which Contain ${FinalCalories.toString()}',
+                          'You Have Eaten ${Amount.toString()} ${FoodName} Which Contain ${FinalCalories}',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 30,
@@ -207,29 +220,32 @@ class _ImageCaloriesPageState extends State<ImageCaloriesPage> {
                             ),
                           ),
                           onPressed: () async {
-                            await CaloriesDB()
+                            setState(() {
+                              isLoading = true;
+                            });
+
+                            CaloriesDB()
                                 .addCalories(
-                                    FoodName, ParsedateDB(widget.selectedDate))
+                                    FoodName,
+                                    ParsedateDB(widget.selectedDate),
+                                    FinalCalories)
                                 .then((value) {
                               setState(() {
-                                isLoading = true;
+                                isLoading = false;
+                                WidgetsBinding
+                                    .instance.focusManager.primaryFocus
+                                    ?.unfocus();
+                                Navigator.pushAndRemoveUntil(
+                                  (context),
+                                  MaterialPageRoute(
+                                      builder: (context) => CaloriesPage()),
+                                  (Route<dynamic> route) => true,
+                                );
+                                print(
+                                  'Added',
+                                );
                               });
                             });
-                            setState(() {
-                              isLoading = false;
-
-                              WidgetsBinding.instance.focusManager.primaryFocus
-                                  ?.unfocus();
-                            });
-                            Navigator.pushAndRemoveUntil(
-                              (context),
-                              MaterialPageRoute(
-                                  builder: (context) => CaloriesPage()),
-                              (Route<dynamic> route) => true,
-                            );
-                            print(
-                              'Added',
-                            );
                           },
                           child: const Text(
                             'Add',

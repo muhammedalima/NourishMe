@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:get/get.dart';
-import 'package:nourish_me/constants/Constants.dart';
 
 final databaseref = FirebaseDatabase.instance.ref('User');
 final user = FirebaseAuth.instance.currentUser;
@@ -52,12 +51,33 @@ class UserDB implements userdatafunction {
           userdetail.child('tweight').value.toString(),
           userdetail.child('age').value.toString(),
           userdetail.child('exercise').value.toString(),
-          userdetail.child('noofday').value.toString(),
         ]);
-        final Calories = '60';
-        addCaloriesInside(Calories);
+        final String noofday;
+
+        final String Calorie;
+        final bmr =
+            BMR(userDetails[2], userDetails[2], userDetails[6], userDetails[3]);
+        final ttde = TTDE(userDetails[7], bmr);
+        final int weight_difference =
+            int.parse(userDetails[5]) - int.parse(userDetails[2]);
+        if (weight_difference > 0) {
+          Calorie = ((ttde * 110).round()).toString();
+
+          noofday = (weight_difference.round()).toString();
+        } else if (weight_difference < 0) {
+          Calorie = ((ttde - 500).round()).toString();
+          noofday = (((weight_difference * -1) * 0.453592).round()).toString();
+        } else {
+          Calorie = ttde.toString();
+          noofday = '0';
+        }
+        addCaloriesInside(Calorie);
+        addnoofdayInside(noofday);
         userDetails.add(
-          userdetail.child('Calorie').value.toString(),
+          noofday,
+        );
+        userDetails.add(
+          Calorie,
         );
       }
     } catch (error) {
@@ -75,7 +95,22 @@ class UserDB implements userdatafunction {
           );
       print('Refreshed Calorie added successfully with email: ${user!.email}');
     } on FirebaseAuthException catch (e) {
-      Get.snackbar("Error", e.code, colorText: Primary_green);
+      Get.snackbar('Oops', e.code);
+    } catch (error) {
+      print('Error adding name: $error');
+    }
+  }
+
+  Future<void> addnoofdayInside(
+    String Calories,
+  ) async {
+    try {
+      await databaseref.child('${user!.uid}/noofday').set(
+            Calories,
+          );
+      print('Refreshed Calorie added successfully with email: ${user!.email}');
+    } on FirebaseAuthException catch (e) {
+      Get.snackbar('Oops', e.code);
     } catch (error) {
       print('Error adding name: $error');
     }
@@ -138,23 +173,7 @@ class UserDB implements userdatafunction {
   Future<void> addUserDetail(String name, String weight, String tweight,
       String height, String age, String gender) async {
     try {
-      final String noofday;
       final String exercise = 'l';
-      final String Calorie;
-      final bmr = BMR(weight, height, age, gender);
-      final ttde = TTDE(exercise, bmr);
-      final int weight_difference = int.parse(tweight) - int.parse(weight);
-      if (weight_difference > 0) {
-        Calorie = ((ttde * 110).round()).toString();
-
-        noofday = (weight_difference.round()).toString();
-      } else if (weight_difference < 0) {
-        Calorie = (ttde - 500).toString();
-        noofday = (((weight_difference * -1) * 0.453592).round()).toString();
-      } else {
-        Calorie = ttde.toString();
-        noofday = '0';
-      }
 
       final bmi = (10000 *
               (int.parse(weight) / (int.parse(height) * int.parse(height))))
@@ -168,13 +187,11 @@ class UserDB implements userdatafunction {
         'tweight': tweight,
         'age': age,
         'exercise': exercise,
-        'noofday': noofday,
-        'Calorie': Calorie,
       });
       await RefreshData();
       print('UserDetails added successfully with email: ${user!.email}');
     } on FirebaseAuthException catch (e) {
-      Get.snackbar("Error", e.code, colorText: Primary_green);
+      Get.snackbar('Oops', e.code);
     } catch (error) {
       print('Error adding name: $error');
     }
@@ -188,7 +205,7 @@ class UserDB implements userdatafunction {
       await addUserDetail(_name!, _weight, weight, _height!, _age!, _gender!);
       print('Target Weight added successfully with email: ${user!.email}');
     } on FirebaseAuthException catch (e) {
-      Get.snackbar("Error", e.code, colorText: Primary_green);
+      Get.snackbar('Oops', e.code);
     } catch (error) {
       print('Error adding name: $error');
     }
@@ -202,7 +219,7 @@ class UserDB implements userdatafunction {
       await addUserDetail(_name!, weight, _tweight, _height!, _age!, _gender!);
       print('Current Weight added successfully with email: ${user!.email}');
     } on FirebaseAuthException catch (e) {
-      Get.snackbar("Error", e.code, colorText: Primary_green);
+      Get.snackbar('Oops', e.code);
     } catch (error) {
       print('Error adding name: $error');
     }

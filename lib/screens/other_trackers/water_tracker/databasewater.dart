@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:nourish_me/constants/Constants.dart';
 
 final databaseref = FirebaseDatabase.instance.ref('UserDetails');
 final user = FirebaseAuth.instance.currentUser;
@@ -100,7 +99,7 @@ class WaterDB implements userdatafunction {
       });
       print('UserDetails added successfully with email: ${user!.email}');
     } on FirebaseAuthException catch (e) {
-      Get.snackbar("Error", e.code, colorText: Primary_green);
+      Get.snackbar('Oops', e.code);
     } catch (error) {
       print('Error adding wtime: $error');
     }
@@ -113,7 +112,7 @@ class WaterDB implements userdatafunction {
           .remove();
       print('UserDetails added successfully with email: ${user!.email}');
     } on FirebaseAuthException catch (e) {
-      Get.snackbar("Error", e.code, colorText: Primary_green);
+      Get.snackbar('Oops', e.code);
     } catch (error) {
       print('Error adding wtime: $error');
     }

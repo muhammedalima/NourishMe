@@ -16,16 +16,13 @@ class Geminifunction {
     String? calories;
     try {
       final calories = await FoodCalories(name);
-      print('${calories} after final calories');
       if (calories == null) {
         print('error');
       }
-      if (jsonDecode(calories!) case {'Calories': String items}) {
-        print('${items} inside print items');
-        if (items == "```") {
-          return '80';
-        }
-        return items;
+      final jsonData = jsonDecode(calories!);
+      if (jsonData is Map && jsonData.containsKey('Calories')) {
+        final caloriesValue = jsonData['Calories'] as String;
+        return caloriesValue;
       }
       throw const GeminierrorException('Invalid JSON schema');
     } on GenerativeAIException {
@@ -34,9 +31,7 @@ class Geminifunction {
       );
     } catch (e) {
       if (e is GeminierrorException) rethrow;
-
-      print('${calories} inside error');
-      print(e);
+      print('/////////////// ERROR EXECPTION //////////////////');
       return '60';
     }
   }
@@ -63,16 +58,18 @@ class Geminifunction {
   }
 
   Future<String?> FoodCalories(String name) async {
-    print('hello');
-    final prompt = 'You are a calories finder.'
-        'You have given the ${name} find the calories.'
-        'You have too give only the average one value.'
-        'Your value must be constant.'
-        'You doesnt find the calories give your response as error.'
+    final prompt =
+        'your a calorie find find calorie of food items just by its name'
+        'Your find the average calories of the food'
         'Provide your response as a JSON object with the following schema: {"Calories": ""}.'
-        'Do not return your result as Markdown.';
-    print(prompt);
+        'Only JSON object is needed.'
+        'your output must be an single value.'
+        'example if biriyani have 300-400 calorie then set Calories as 350.'
+        'find the calorie of the food = ${name}.'
+        'If you doesnot find food calorie set calorie as error';
+
     final response = await _model.generateContent([Content.text(prompt)]);
+    print('${response.text} inside');
     return response.text;
   }
 

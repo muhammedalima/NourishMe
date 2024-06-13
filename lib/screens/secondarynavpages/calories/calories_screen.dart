@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:get/get.dart';
+import 'package:nourish_me/functions/repeatfunction.dart';
 import 'package:nourish_me/screens/home/home_screen.dart';
 import 'package:nourish_me/screens/home_page/widgets/home_widgets.dart';
 import 'package:nourish_me/screens/secondarynavpages/widgets/secondarypagewidgets.dart';
@@ -30,6 +30,8 @@ class _CaloriesPageState extends State<CaloriesPage> {
 
   String todaycalorie = '';
   String targetcalorie = '';
+  int Amount = 1;
+  bool numbervisble = false;
   late List<CaloriesListItem> CalorieListed;
   getvalues() async {
     CalorieListed = await CaloriesDB().getList(ParsedateDB(_selectedDate));
@@ -191,6 +193,9 @@ class _CaloriesPageState extends State<CaloriesPage> {
                         children: [
                           Flexible(
                             child: TextFormField(
+                              onTap: () => setState(() {
+                                numbervisble = true;
+                              }),
                               controller: NameController,
                               decoration: const InputDecoration(
                                 border: InputBorder.none,
@@ -237,34 +242,40 @@ class _CaloriesPageState extends State<CaloriesPage> {
                               onPressed: () async {
                                 try {
                                   if (NameController.text.isEmpty) {
-                                    Get.snackbar(
-                                        "Error", "Please fill in all fields.",
-                                        colorText: Colors.black);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        popumsg(
+                                            'Oops!', 'Enter the Food name'));
                                     return;
                                   } else {
                                     setState(() {
+                                      numbervisble = false;
                                       isLoading = true;
                                       WidgetsBinding
                                           .instance.focusManager.primaryFocus
                                           ?.unfocus();
                                     });
-                                    await CaloriesDB()
-                                        .addCalories(
-                                      NameController.text,
-                                      ParsedateDB(_selectedDate),
-                                    )
+                                    CaloriesDB()
+                                        .checkcalories(NameController.text)
                                         .then((value) {
-                                      getvalues().then((value) {
-                                        setState(() {
-                                          NameController.clear();
-                                          isLoading = false;
+                                      CaloriesDB()
+                                          .addCalories(
+                                              NameController.text,
+                                              ParsedateDB(_selectedDate),
+                                              (Amount * value).toString())
+                                          .then((value) {
+                                        getvalues().then((value) {
+                                          setState(() {
+                                            Amount = 1;
+                                            NameController.clear();
+                                            isLoading = false;
+                                          });
                                         });
                                       });
                                     });
                                   }
                                 } catch (e) {
-                                  Get.snackbar("Error", e.toString(),
-                                      colorText: Primary_green);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      popumsg('Oops', e.toString()));
                                 }
                                 ;
                               },
@@ -274,6 +285,78 @@ class _CaloriesPageState extends State<CaloriesPage> {
                       ),
                     ),
                   ),
+                  numbervisble
+                      ? Container(
+                          margin: const EdgeInsets.all(
+                            6,
+                          ),
+                          height: 60,
+                          decoration: ShapeDecoration(
+                            shape: RoundedRectangleBorder(
+                              side: const BorderSide(
+                                  width: 1, color: Colors.white),
+                              borderRadius: BorderRadius.circular(9),
+                            ),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Text(
+                                  'Amount : ${Amount.toString()}',
+                                  style: TextStyle(
+                                    color: custom_grey,
+                                  ),
+                                ),
+                                Flexible(
+                                    child: SizedBox(
+                                  width: double.maxFinite,
+                                )),
+                                Ink(
+                                  width: 40,
+                                  decoration: const ShapeDecoration(
+                                    color: Color(0xFFC0DB3F),
+                                    shape: CircleBorder(),
+                                  ),
+                                  child: IconButton(
+                                    icon: const Icon(Icons.remove),
+                                    color: Colors.white,
+                                    onPressed: () {
+                                      setState(() {
+                                        if (Amount == 1) {
+                                          Amount = 1;
+                                        } else {
+                                          Amount = Amount - 1;
+                                        }
+                                      });
+                                    },
+                                  ),
+                                ),
+                                const SizedBox(
+                                  width: 6,
+                                ),
+                                Ink(
+                                  width: 40,
+                                  decoration: const ShapeDecoration(
+                                    color: Color(0xFFC0DB3F),
+                                    shape: CircleBorder(),
+                                  ),
+                                  child: IconButton(
+                                    icon: const Icon(Icons.add),
+                                    color: Colors.white,
+                                    onPressed: () {
+                                      setState(() {
+                                        Amount = Amount + 1;
+                                      });
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                      : SizedBox(),
                   const SizedBox(
                     height: 10,
                   ),

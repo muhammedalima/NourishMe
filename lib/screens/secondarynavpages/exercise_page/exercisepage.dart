@@ -59,7 +59,7 @@ class _ExercisePageState extends State<ExercisePage> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text(
-                          'Hard',
+                          'Little',
                           style: TextStyle(
                             fontSize: 35,
                             fontWeight: FontWeight.w900,

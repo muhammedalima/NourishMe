@@ -1,9 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:nourish_me/database/databaseuser.dart';
-import 'package:nourish_me/screens/home_page/widgets/home_widgets.dart';
 import 'package:nourish_me/constants/Constants.dart';
+import 'package:nourish_me/database/databaseuser.dart';
+import 'package:nourish_me/functions/repeatfunction.dart';
+import 'package:nourish_me/screens/home_page/widgets/home_widgets.dart';
+import 'package:nourish_me/screens/loginsignup/wrapper.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -66,8 +68,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     noofday = getnoofday();
   }
 
-  singout() async {
+  SignOut() async {
     await FirebaseAuth.instance.signOut();
+    Get.offAll(() => Wrapper());
   }
 
   bool isLoading = false;
@@ -560,9 +563,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             heightcontroller.text.isEmpty ||
                                             agecontroller.text.isEmpty ||
                                             gendercontroller.text.isEmpty) {
-                                          Get.snackbar("Error",
-                                              "Please fill in all fields.",
-                                              colorText: Colors.black);
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(popumsg(
+                                                  'Oops', 'Enter the details'));
                                           return;
                                         } else {
                                           setState(() {
@@ -590,8 +593,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           edit = true;
                                         });
                                     } catch (e) {
-                                      Get.snackbar("Error", e.toString(),
-                                          colorText: Primary_green);
+                                      throw e;
                                     }
                                   },
                                   child: Text(
@@ -622,7 +624,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             edit = false;
                                             isLoading = false;
                                           })
-                                        : singout();
+                                        : SignOut();
                                   },
                                   child: Text(
                                     edit ? 'Cancel' : 'Log Out',

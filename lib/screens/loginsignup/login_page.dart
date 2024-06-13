@@ -23,9 +23,9 @@ class _LoginScreenState extends State<LoginScreen> {
           email: email.text, password: password.text);
       await UserDB.instances.RefreshData();
     } on FirebaseAuthException catch (e) {
-      Get.snackbar("Error", e.code, colorText: Primary_green);
+      Get.snackbar('Oops', e.code);
     } catch (e) {
-      Get.snackbar("Error", e.toString());
+      throw e;
     }
   }
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:nourish_me/database/databaseuser.dart';
+import 'package:nourish_me/functions/repeatfunction.dart';
 import 'package:nourish_me/screens/home/home_screen.dart';
 import 'package:nourish_me/screens/home_page/widgets/home_widgets.dart';
 import 'package:nourish_me/constants/Constants.dart';
@@ -272,8 +272,8 @@ class _WeightPageState extends State<WeightPage> {
                                 });
                               }
                             } catch (e) {
-                              Get.snackbar("Error", e.toString(),
-                                  colorText: Primary_green);
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(popumsg('Oops', e.toString()));
                             }
                           },
                           child: Text(

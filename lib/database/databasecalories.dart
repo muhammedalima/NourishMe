@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -5,17 +7,14 @@ import 'package:get/get.dart';
 import 'package:nourish_me/database/databaseuser.dart';
 import 'package:nourish_me/functions/repeatfunction.dart';
 import 'package:nourish_me/geminiapi/gemini.dart';
-import 'package:nourish_me/constants/Constants.dart';
 
 final databaseref = FirebaseDatabase.instance.ref('UserDetails');
 final user = FirebaseAuth.instance.currentUser;
 final databasecal = FirebaseDatabase.instance.ref('caloriesvalue');
 
 abstract class userdatafunction {
-  Future<void> addCalories(
-    String name,
-    String _selectedDate,
-  );
+  Future<void> addCalories(String name, String _selectedDate, String Calories);
+  Future<int> checkcalories(String name);
   Future<CaloriesListItem> getCaloriesvalue(String Value, String _selectedDate);
   Future<List<CaloriesListItem>> getList(String _selectedDate);
   Future<void> addTodayCalorie(
@@ -76,7 +75,6 @@ class CaloriesDB implements userdatafunction {
 
       if (_selectedDate == ParsedateDB(DateTime.now())) {
         todaycalorie = getTotalCalorie();
-        print('success inside add calorie sum finding');
       } else {
         todaycalorie = await getTodayCalorie(_selectedDate);
       }
@@ -85,7 +83,8 @@ class CaloriesDB implements userdatafunction {
           totalCalories += int.parse(item.calorie!);
         }
       }
-      addTodayCalorie(_selectedDate, totalCalories.toString(), todaycalorie);
+      addTodayCalorie(
+          _selectedDate, (totalCalories.round()).toString(), todaycalorie);
     } catch (error) {
       print('Error getting user details: $error');
     }
@@ -115,23 +114,37 @@ class CaloriesDB implements userdatafunction {
   }
 
   @override
-  Future<void> addCalories(
-    String name,
-    String _selectedDate,
-  ) async {
+  Future<int> checkcalories(String name) async {
     String? Calories;
     try {
       final databasecalories = await databasecal.get();
-      print(databasecalories);
       String data = await databasecalories
           .child('${name.toLowerCase()}')
           .value
           .toString();
       if (data != 'null') {
         Calories = data;
+        return int.parse(Calories);
       } else {
-        Calories = await await Geminifunction().Caloriesvalue('$name');
+        Calories = await Geminifunction().Caloriesvalue(name);
+        if (Calories == 'error') {
+          return 0;
+        } else {
+          return int.parse(Calories);
+        }
       }
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  @override
+  Future<void> addCalories(
+    String name,
+    String _selectedDate,
+    String Calories,
+  ) async {
+    try {
       String time = DateTime.now().millisecondsSinceEpoch.toString();
       await databaseref
           .child('${user!.uid}/${_selectedDate}/calories/List/${time}')
@@ -143,7 +156,7 @@ class CaloriesDB implements userdatafunction {
       getList(_selectedDate);
       print('UserDetails added successfully with email: ${user!.email}');
     } on FirebaseAuthException catch (e) {
-      Get.snackbar("Error", e.code, colorText: Primary_green);
+      Get.snackbar('Oops', e.code);
     } catch (error) {
       print('Error adding name: $error');
     }
@@ -155,10 +168,9 @@ class CaloriesDB implements userdatafunction {
       await databaseref
           .child('${user!.uid}/${_selectedDate}/calories/List/${id}')
           .remove();
-      print(id);
       print('UserDetails deleted successfully with email: ${user!.email}');
     } on FirebaseAuthException catch (e) {
-      Get.snackbar("Error", e.code, colorText: Primary_green);
+      Get.snackbar('Oops', e.code);
     } catch (error) {
       print('Error adding name: $error');
     }
@@ -212,7 +224,6 @@ class CaloriesDB implements userdatafunction {
 
       if (calories.exists) {
         Values = calories.child('targetCalorie').value.toString();
-        print('target working');
         return Values;
       }
     } catch (e) {

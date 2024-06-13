@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:nourish_me/functions/repeatfunction.dart';
 import 'package:nourish_me/screens/home/home_screen.dart';
@@ -185,9 +184,10 @@ class _WaterTrackerState extends State<WaterTracker> {
                             onPressed: () async {
                               try {
                                 if (NumberController.text.isEmpty) {
-                                  Get.snackbar(
-                                      "Error", "Please fill in all fields.",
-                                      colorText: Colors.black);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      popumsg(
+                                          'Oops!', 'Enter the no of glasses'));
+
                                   return;
                                 } else {
                                   setState(() {
@@ -213,8 +213,7 @@ class _WaterTrackerState extends State<WaterTracker> {
                                   });
                                 }
                               } catch (e) {
-                                Get.snackbar("Error", e.toString(),
-                                    colorText: Primary_green);
+                                print(e);
                               }
                               ;
                             },

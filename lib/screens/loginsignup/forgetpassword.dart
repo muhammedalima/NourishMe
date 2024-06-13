@@ -18,11 +18,11 @@ class _ForgetPasswordState extends State<ForgetPassword> {
   reset() async {
     try {
       await FirebaseAuth.instance.sendPasswordResetEmail(email: email.text);
-      Get.offAll(Wrapper());
+      Get.offAll(() => Wrapper());
     } on FirebaseAuthException catch (e) {
-      Get.snackbar("Error", e.code, colorText: Primary_green);
+      Get.snackbar('Oops', e.code);
     } catch (e) {
-      Get.snackbar("Error", e.toString());
+      throw e;
     }
   }
 
