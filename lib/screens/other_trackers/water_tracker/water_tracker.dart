@@ -229,7 +229,7 @@ class _WaterTrackerState extends State<WaterTracker> {
                 isLoading
                     ? LoadingScreen()
                     : Container(
-                        height: 500,
+                        height: 350,
                         child: ListView.separated(
                             itemBuilder: (BuildContext, index) {
                               final _Waters = WaterListed[index];

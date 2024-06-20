@@ -121,7 +121,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   height: 150,
                                   child: Row(
                                     mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Image.asset(
                                         "assets/images/${gender == 'Male' ? 'Man' : 'Women'}${_image[id]}.png",
@@ -150,7 +150,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             ),
                                             Flexible(
                                               child: Text(
-                                                'You Are ${_image[id]}',
+                                                'You Are\n ${_image[id]}',
+                                                textAlign: TextAlign.right,
                                               ),
                                             ),
                                           ],

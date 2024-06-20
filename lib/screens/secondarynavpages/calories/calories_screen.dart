@@ -363,7 +363,7 @@ class _CaloriesPageState extends State<CaloriesPage> {
                   isLoading
                       ? LoadingScreen()
                       : Container(
-                          height: 450,
+                          height: 400,
                           child: ListView.separated(
                               itemBuilder: (BuildContext, index) {
                                 final _Calories = CalorieListed[index];

@@ -117,21 +117,25 @@ class CaloriesDB implements userdatafunction {
   Future<int> checkcalories(String name) async {
     String? Calories;
     try {
-      final databasecalories = await databasecal.get();
+      /*final databasecalories = await databasecal.get();
       String data = await databasecalories
           .child('${name.toLowerCase()}')
           .value
           .toString();
-      if (data != 'null') {
-        Calories = data;
-        return int.parse(Calories);
+      print(data);
+      if (data != null) {
+        print('inisde null ${Calories}');
+
+        return int.parse(data);
+      } else {*/
+      Calories = await Geminifunction().Caloriesvalue(name);
+      print('error after calories');
+      if (Calories == 'error') {
+        print('inside calories error');
+        return 0;
       } else {
-        Calories = await Geminifunction().Caloriesvalue(name);
-        if (Calories == 'error') {
-          return 0;
-        } else {
-          return int.parse(Calories);
-        }
+        print(Calories);
+        return int.parse(Calories);
       }
     } catch (e) {
       throw e;

@@ -1,6 +1,9 @@
+// ignore_for_file: unused_import
+
 import 'package:flutter/material.dart';
 import 'package:nourish_me/screens/other_trackers/Diet_plan/NourishNavi.dart';
 import 'package:nourish_me/constants/Constants.dart';
+import 'package:nourish_me/screens/other_trackers/Diet_plan/Nourishnavirecipe.dart';
 
 class DietPlaner extends StatelessWidget {
   const DietPlaner({super.key});
@@ -52,7 +55,8 @@ class DietPlaner extends StatelessWidget {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => NourishNavi()),
+                        MaterialPageRoute(
+                            builder: (context) => Nourishnavirecipe()),
                       );
                     },
                     child: const Text(

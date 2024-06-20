@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:nourish_me/constants/Constants.dart';
+import 'package:nourish_me/database/databaseuser.dart';
 
 class Geminifunction {
   Geminifunction()
@@ -69,7 +70,6 @@ class Geminifunction {
         'If you doesnot find food calorie set calorie as error';
 
     final response = await _model.generateContent([Content.text(prompt)]);
-    print('${response.text} inside');
     return response.text;
   }
 
@@ -86,6 +86,32 @@ class Geminifunction {
     ]);
 
     return response.text;
+  }
+
+  Future<String?> Reciepe() async {
+    print('/////////////Started////////////////');
+    final totalcalorie = await getTotalCalorie();
+    final prompt = '''
+    You are a NourishNavi who's a chef that travels around the world a lot, and your travels inspire recipes.
+    
+    Recommend a recipe for me  based on the amount of calories i ate daily is ${totalcalorie}.
+    The recipe should only contain real, edible ingredients.
+    Adhere to food safety and handling best practices like ensuring that poultry is fully cooked.
+    Do not repeat any ingredients.
+    Do not use symbols in the recipe.
+
+
+    After providing the recipe, add an descriptions that creatively explains why the recipe is good based on today consumable calories.  Tell a short story of a travel experience that inspired the recipe.
+    List out any ingredients that are potential allergens.
+    Provide a summary of how many people the recipe will serve and the the nutritional information per serving.
+
+    
+
+    ''';
+
+    final response = await _model.generateContent([Content.text(prompt)]);
+
+    return '${response.text}';
   }
 }
 

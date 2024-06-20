@@ -1,14 +1,12 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:nourish_me/database/databasecalories.dart';
 import 'package:nourish_me/functions/repeatfunction.dart';
 import 'package:nourish_me/geminiapi/gemini.dart';
 import 'package:nourish_me/screens/home_page/widgets/home_widgets.dart';
 import 'package:nourish_me/screens/secondarynavpages/calories/calories_screen.dart';
 import 'package:nourish_me/constants/Constants.dart';
-import 'package:nourish_me/screens/secondarynavpages/widgets/secondarypagewidgets.dart';
 
 class ImageCaloriesPage extends StatefulWidget {
   final File imagefile;
@@ -30,14 +28,24 @@ class _ImageCaloriesPageState extends State<ImageCaloriesPage> {
   Uint8List? imageinbyte;
   int Amount = 1;
   late String FoodName;
-  late String FinalCalories;
-  late String Calories;
+  String FinalCalories = '0';
+  late String Calories = '0';
   bool isLoading = true;
 
   setvalues() async {
     FoodName = await Geminifunction().FindName(widget.imageinbytes);
+  }
 
-    FinalCalories = await (CaloriesDB().checkcalories(FoodName)).toString();
+  setvalues2() async {
+    isLoading = true;
+    (CaloriesDB().checkcalories(FoodName)).then((value) {
+      setState(() {
+        FinalCalories = value.toString();
+        isLoading = false;
+        Calories = FinalCalories;
+        print('${FinalCalories}');
+      });
+    });
   }
 
   @override
@@ -46,20 +54,8 @@ class _ImageCaloriesPageState extends State<ImageCaloriesPage> {
 
     setvalues().then((value) {
       setState(() {
-        if (FoodName == 'error' || FinalCalories == '0') {
-          Get.snackbar('Oops!', 'Take the correct image');
-          Navigator.pushAndRemoveUntil(
-            (context),
-            MaterialPageRoute(
-              builder: (context) => CameraAccessWidget(
-                selectedDate: widget.selectedDate,
-              ),
-            ),
-            (Route<dynamic> route) => true,
-          );
-        }
-        Calories = FinalCalories;
         isLoading = false;
+        setvalues2();
       });
     });
     super.initState();
@@ -195,7 +191,7 @@ class _ImageCaloriesPageState extends State<ImageCaloriesPage> {
                       ),
                     ),
                     Container(
-                      height: 350,
+                      height: 300,
                       child: SingleChildScrollView(
                         child: Text(
                           'You Have Eaten ${Amount.toString()} ${FoodName} Which Contain ${FinalCalories}',
