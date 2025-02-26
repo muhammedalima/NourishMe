@@ -37,6 +37,7 @@ class NourishMe extends StatelessWidget {
           ),
           colorScheme: ColorScheme.fromSeed(
             seedColor: const Color(0xFFC0DB3F),
+            surface: Colors.black,
             background: Colors.black,
           ),
           useMaterial3: true,

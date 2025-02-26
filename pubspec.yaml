@@ -56,6 +56,8 @@ dependencies:
   flash: ^3.1.0
   fluttertoast: ^8.2.6
   toastification: ^2.0.0
+  flutter_animate: ^4.5.2
+  share_plus:
 
 
 

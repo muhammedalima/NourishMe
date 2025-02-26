@@ -1,45 +1,75 @@
 import 'package:flutter/material.dart';
+import 'package:nourish_me/database/databasecalories.dart';
 import 'package:nourish_me/database/databaseuser.dart';
+import 'package:nourish_me/functions/repeatfunction.dart';
+import 'package:nourish_me/screens/home_page/widgets/home_widgets.dart';
 import 'package:nourish_me/screens/other_trackers/Diet_plan/Diet_planer.dart';
 import 'package:nourish_me/screens/other_trackers/water_tracker/water_tracker.dart';
 import 'package:nourish_me/screens/secondarynavpages/Weight_Page/weight_page.dart';
 import 'package:nourish_me/screens/secondarynavpages/calories/calories_screen.dart';
-import 'package:nourish_me/screens/home_page/widgets/home_widgets.dart';
-import 'package:nourish_me/screens/secondarynavpages/exercise_page/exercisepage.dart';
 
 class homeScreenPage extends StatefulWidget {
   const homeScreenPage({super.key});
 
+  static ValueNotifier<int> selectedIndexNotifier = ValueNotifier(0);
+
   @override
-  State<homeScreenPage> createState() => _homeScreenPageState();
+  _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _homeScreenPageState extends State<homeScreenPage> {
-  @override
+class _HomeScreenState extends State<homeScreenPage> {
   late String value;
   bool isloading = true;
+  String targetCalorie = "0";
+
+  @override
   void initState() {
-    isloading = true;
-    UserDB().RefreshData().then((v) {
-      value = ((int.parse(getTotalCalorie()) / 1000).round()).toString();
-      isloading = false;
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    setState(() {
+      isloading = true;
     });
 
-    super.initState();
+    try {
+      await UserDB().RefreshData();
+      String target =
+          await CaloriesDB().getTargetCalorie(ParsedateDB(DateTime.now()));
+      setState(() {
+        value = ((int.parse(getTotalCalorie()) / 1000).round()).toString();
+        targetCalorie = target;
+        isloading = false;
+      });
+    } catch (e) {
+      print("Error loading user data: $e");
+      setState(() {
+        isloading = false;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return isloading
-        ? LoadingScreen()
+        ? const Center(child: CircularProgressIndicator())
         : SingleChildScrollView(
+          
             child: Column(
+              
               children: [
                 AddCard(
-                  progressindex: 0.1,
+                  progressindex: targetCalorie != "0"
+                      ? (int.parse(getTotalCalorie()) /
+                              int.parse(targetCalorie))
+                          .clamp(0.0, 1.0)
+                      : 0.0,
                   screens: CaloriesPage(),
                   headingTitle: 'Goal',
-                  headingInsideCard: '${value}/Kcal',
+                  headingInsideCard: targetCalorie != "0"
+                      ? '${value}/${(int.parse(targetCalorie) / 1000).round()}Kcal'
+                      : '${value}/Kcal',
                   subHeadingCard: 'Eat Upto Today',
                 ),
                 AddCard(
@@ -59,16 +89,16 @@ class _homeScreenPageState extends State<homeScreenPage> {
                   headingInsideCard: 'Hard',
                   subHeadingCard: 'Exercise Type',
                 ),*/
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 Padding(
-                  padding: EdgeInsets.all(37.0),
+                  padding: const EdgeInsets.all(37.0),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         'Other Tracker',
                         style: TextStyle(
                           color: Colors.white,
@@ -81,36 +111,18 @@ class _homeScreenPageState extends State<homeScreenPage> {
                             child: SquareBox(
                               screens: WaterTracker(),
                               heading: 'Daily Water \n Tracker',
-                              boxcolor: Color(0xFFC0DB3F),
+                              boxcolor: const Color(0xFFC0DB3F),
                             ),
                           ),
                           Expanded(
                             child: SquareBox(
                               screens: DietPlaner(),
                               heading: 'Diet Plan \n For The Day',
-                              boxcolor: Color(0xFF5E3FDB),
+                              boxcolor: const Color(0xFF5E3FDB),
                             ),
                           ),
                         ],
                       ),
-                      //Row(
-                      //children: [
-                      //Expanded(
-                      //child: SquareBox(
-                      //screens: CaloriesPage(),
-                      //heading: 'Check Your\nCalorie',
-// boxcolor: Color(0xFF5E3FDB),
-//                      ),
-//                    ),
-                      //                   Expanded(
-                      //                    child: SquareBox(
-                      //                     screens: CaloriesPage(),
-                      //                    heading: 'Educational\nResources',
-                      //                   boxcolor: Color(0xFFC0DB3F),
-                      //               ),
-                      //           ),
-                      //       ],
-                      //   ),
                     ],
                   ),
                 ),
